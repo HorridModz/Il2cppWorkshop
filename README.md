@@ -3,7 +3,7 @@
 # This is a massive project. Help is greatly appreciated! Feel free to make pull requests or contact me with code or suggestions. Contact User123456789#6424 on discord, and if that doesn't work, try User123456789#8073.
 Made in python
 
-#Goals:
+# Goals:
 - Infinite loop protection: These program has multiple defenses against it getting stuck in infinite loops. There is an error system, where the code checks for errors and can log the error to the console and / or visually display the error, and some errors will cause it to forcefully terminate. There is also a warning system, and a log system so you can find what went wrong. There are debugging tools and live analytics, helping you know when the program is stuck and why. In addition, loops don't just run and delay everything else: Some loops have abort systems, log things, and check if they are stuck in an infinite loop.
 - Cloud backup system: Backup the program data to the cloud, so you do not lose your progress / data! Each ip address has their own backup folder. Make sure you do not use a vpn, and you have a static ip address, or this backup will not sync. OR maybe there will be a username and return "Not Done"word or token system. You can choose to manually backup, and automatic backups may be available from time to time, depending on the capabilities of the server hosting.
 - Import your own files, or choose from one of the existing ones. Maybe even a cloud system where people can upload files for others?

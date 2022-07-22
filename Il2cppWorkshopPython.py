@@ -1,3 +1,4 @@
+#THIS IS A WIP. IT IS NOT DONE. DO NOT TRY TO USE IT YET.
 #TO ANYONE READING THIS: These notes are messy and unfinished - they are more like notes for my notes.
 #Do not bother reading them beyond the known bugs / limitations section.
 

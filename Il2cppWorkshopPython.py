@@ -200,6 +200,20 @@ import warnings
 import importlib
 import pip
 
+
+#   Require Correct Version
+
+#Thanks to https://stackoverflow.com/questions/6224736/how-to-write-python-code-that-is-able-to-properly-require-a-minimal-python-versi
+MIN_VERSION = (3, 7)
+MAX_VERSION = (3, 10)
+CURRENT_VERSION = (sys.version_info[0],sys.version_info[1])
+if CURRENT_VERSION < MIN_VERSION:
+    print("Python %s.%s or later is required for the program to work correctly." % MIN_VERSION)
+    sys.exit("You are currently using Python %s.%s." % CURRENT_VERSION)
+if CURRENT_VERSION > MAX_VERSION:
+    print("WARNING:\nPython %s.%s is highly recommended. Later versions may cause bugs." % MAX_VERSION)
+    print("You are currently using Python %s.%s.\n" % CURRENT_VERSION)
+    
 #   Importing Modules
 
 def modulenotfounderror(module,terminate = True):
@@ -355,7 +369,7 @@ def init():
 
             #Types            
             global _types
-            _types = ["virtual","dictionary","predicate","func","new","static","protected","public","private","internal","readonly","const","final","void","bool","byte","int16","int32","int64","uint16","uint32","uint64","char","decimal","single","double","float","int","long","sbyte","short","uint","ulong","ushort","string","array","Array","list","List","delegate","Delegate","object"]
+            _types = ["t","virtual","dictionary","predicate","func","new","static","protected","public","private","internal","readonly","const","final","void","bool","byte","int16","int32","int64","uint16","uint32","uint64","char","decimal","single","double","float","int","long","sbyte","short","uint","ulong","ushort","string","array","Array","list","List","delegate","Delegate","object"]
             typeprefixes = []
             typesuffixes = ["[]","?"]
             addtypeprefixesandsuffixes(typeprefixes,typesuffixes)
@@ -407,10 +421,10 @@ def init():
             global _contentends
             _contentends = ["}","// Methods","// Fields","// Properties"]
             _contentends = set(_contentends)
-            global _genericintsmethodstart
-            _genericintsmethodstart = "/* GenericInstMethod :"
-            global _genericintsmethodend
-            _genericintsmethodend = "*/"
+            global _genericinstmethodstart
+            _genericinstmethodstart = "/* GenericInstMethod :"
+            global _genericinstmethodend
+            _genericinstmethodend = "*/"
             global _datatypegroupstart
             _datatypegroupstart = "<"
             global _datatypegroupend
@@ -436,7 +450,7 @@ def init():
             global _methodparamsend
             _methodparamsend = ")"
             global _ismethodstring
-            _ismethodstring = ") {}"
+            _ismethodstring = ") {"
             global _ispropertystring
             _ispropertystring = "; }"
             global _isfieldstring
@@ -517,20 +531,6 @@ def init():
             if requesttype == "post":
                 return(requests.post(url, data = str(gettypeorpoststr),timeout = int(timeout)))
             
-    #Init flags for what has been done and what hasn't
-        def initflags():
-            #dumpcs flags
-            global flagdumpcs
-            flagdumpcs = False
-            global flagdumpcspath
-            flagdumpcspath = False
-            global flagfullobjects
-            flagfullobjects = False
-            global flagremovedattributes
-            flagremovedattributes = False
-            global flagremovedshared
-            flagremovedshared = False
-        
         #inithttp()
         initstringandnumberconstants()
         initdumpcsconstants()
@@ -543,6 +543,29 @@ def init():
         usenamingchars = False
         namingchars = "丕世东专丛三丐丄丗丈七丒上丘丟丁丝业丏一丙丌丂不下与万且丅丑丞丆年月日년월일시분초時时分秒"
         namingregex = "\\p{L}\\p{M}*"
+
+
+#       Flags
+
+#   #Init flags for what has been done and what hasn't
+def initflags():
+            #dumpcs flags
+            global flagdumpcs
+            flagdumpcs = False
+            global flagdumpcspath
+            flagdumpcspath = False
+            global flagfullobjects
+            flagfullobjects = False
+            global flagremovedattributes
+            flagremovedattributes = False
+            global flagremovedshared
+            flagremovedshared = False
+
+resetflags = initflags #same thing, but different name
+
+def updateflag(flag,condition = True):
+            globals()[flag] = condition
+        
 
 
         
@@ -909,20 +932,20 @@ def removeblanklines(fullstr,beginning = True,end = True,allblanklines = False):
         newlines = []
         if beginning:
             i = 0
-            while (listitem(i,lines) == "\n"):
+            while (lines[i - 1] == "\n"):
                 i = increment(i)
             while i < len(lines):
                 i = increment(i)
-                newlines.append(listitem(i,lines))
+                newlines.append(lines[i - 1])
         if end:
                 lines = newlines
                 newlines = []
                 i = len(lines)
-                while (listitem(i,lines) == "\n"):
+                while (lines[i - 1] == "\n"):
                     i = increment(i,False)
                 while i > 1:
                     i = increment(i,False)
-                    newlines.insert(0,listitem(i,lines))
+                    newlines.insert(0,lines[i - 1])
     newstr = linestostring(newlines)
     return (newstr)
     
@@ -1029,7 +1052,7 @@ def listreplaceall(thislist,item,new):
     if found:
         listremoveindex(i,thislist)
         '''
-    for i in range(len(thislist)):
+    for i in enumerate(thislist):
         thisitem = thislist[i]
         if thisitem == item: #type is considered
             thislist[i] = new
@@ -1056,8 +1079,8 @@ def indexofitem(item,thislist):
     except:
         return(-1)
 
-def listitembyname(itemname,namelist,wantedlist):
-    return listitem(indexofitem(itemname,namelist),wantedlist)
+def byname(itemname,namelist,wantedlist):
+    return wantedlist[indexofitem(itemname,namelist) - 1]
 
 def listadd(item,thislist):
     if type(thislist) == set:
@@ -1190,6 +1213,7 @@ def hextodec(hexvalue):
 
 def read_file(path,readtype = "r"):
     if not(fileexists(path)):
+            filenotfounderror(path)
             return ""
     try:
         file = openfile(path,readtype,"utf8")
@@ -1296,7 +1320,7 @@ def formattime(rawtime,timeparam = True,dateparam = False):
     return(formattedtime)
 
 def getrawtime(): #time in miliseconds
-    return (int(time.time()*1000)) #localtime only returns seconds, not miliseconds
+    return (int(time.perf_counter()*1000)) #localtime only returns seconds, not miliseconds
 
 def waitmili(miliseconds):
     time.sleep(miliseconds / 1000)
@@ -1411,6 +1435,8 @@ def log(logtype,message,time = True,date = False):
 #   Lib functions
 
 def offsettohex(offset,filepath,hexbytes = 24):
+    if contains("0x",offset):
+        offset = readafter(offset,"0x")
     libfile = openfile(filepath,'rb')
     findoffset = int(offset, 16)
     libfile.seek(findoffset)
@@ -1497,7 +1523,7 @@ def getobjectof(index):
     rangebehind = 0
     startpos = -1
     while startpos == -1:
-        startpos = dumpcs.find("// Namespace: ",((index - rangebehind) - len("// Namespace: ")),len(dumpcs))
+        startpos = dumpcs.find("// Namespace: ",((index - rangebehind) - len("// Namespace: ")),(index - rangebehind))
         if (((index - rangebehind) - len("// Namespace: ")) < 1): #Not found - must be the image at the beginning
             startpos = 0
             return("") # no object
@@ -1515,9 +1541,9 @@ def getmethodof(index):
     if index > (len(dumpcs)- len("\n\n")): #Impossible scenario, but ocd makes me put this here!
         return("")
     rangebehind = 0
-    startpos = -1
-    while startpos == -1:
-        startpos = dumpcs.find("\n\n",((index - rangebehind) - len("\n\n")),len(dumpcs)) + 1
+    startpos = 0
+    while startpos == 0:
+        startpos = dumpcs.find("\n\n",((index - rangebehind) - len("\n\n")),(index - rangebehind)) + 1
         if (((index - rangebehind) - len("\n\n")) < 1): #Not found - must be the beginning (shouldn't happen)
             startpos = 0
             return("") # no method
@@ -1526,12 +1552,10 @@ def getmethodof(index):
     if endpos == -1: #Not found - shouldn't be possible but we assume it is end of dump.cs
         endpos = len(dumpcs) #set to the end
     methodline = removeblanklines(substring(dumpcs,startpos,endpos)).strip()
-    if ((contains(_offsetsuffix,methodline)) and (len(getlines(methodline))) == 1): #just offset line
-        #lines = getlines(dumpcs,True,True)
-        #return (methodline + "\n" + listitem(numberofitem(methodline,lines) + 2,lines).strip()) #line after is method type line
+    if ((contains(_offsetsuffix,methodline)) and (len(getlines(methodline))) == 1): #just method offset line
         rangebehind = -1
-        endpos = -1
-        while endpos == -1:
+        endpos = 1
+        while endpos == 1:
             endpos = dumpcs.find("\n\n",startpos + 3,(startpos + ((index - rangebehind) + len("\n\n")))) + 2
             if  (((index - rangebehind) + len("\n\n")) > len(dumpcs)): #Not found - shouldn't be possible but we assume it is end of dump.cs
                 endpos = len(dumpcs) #set to the end
@@ -1543,7 +1567,8 @@ def getmethodof(index):
         methodline = linestostring(lines)
         if not((contains(_isoffsetstring,methodline)) and contains(_ismethodstring,methodline)): #It isn't a method
             return("")
-        return(methodline)
+        else:
+            return(methodline)
     else: #method offset line and method type line, or not method
         lines = getlines(methodline)
         if len(getlines(methodline)) < 2: #error - must not be a method
@@ -1556,6 +1581,47 @@ def getmethodof(index):
         if not((contains(_isoffsetstring,methodline)) and contains(_ismethodstring,methodline)): #It isn't a method
             return("")
             return(methodline)
+
+def offsettomethod(offset):
+    if contains("0x",offset):
+        offset = readafter(offset,"0x")
+    global dumpcs #local dumpcs defaults to global dumpcs if not defined manually
+    if not(variableexists("dumpcs")):
+             objectnotdeclarederror("dumpcs")
+    offsetindex = dumpcs.find(_offsetprefix + offset + _offsetsuffix)
+    if offsetindex == -1: #not found
+        return("")
+    else:
+        return(getmethodof(offsetindex))
+       
+getmethodofoffset = offsettomethod #same thing, but different name
+
+def offsettofield(offset):
+    if contains("0x",offset):
+        offset = readafter(offset,"0x")
+    global dumpcs #local dumpcs defaults to global dumpcs if not defined manually
+    if not(variableexists("dumpcs")):
+             objectnotdeclarederror("dumpcs")
+    offsetindex = dumpcs.find(_offsetprefix + offset + _offsetsuffix)
+    if offsetindex == -1: #not found
+        return("")
+    else:
+        return(getfieldof(offsetindex))
+       
+getfieldofoffset = offsettofield #same thing, but different name
+
+def getobjectofoffset(offset):
+    method = offsettomethod(offset)
+    if method != "":
+        return(method)
+    else:
+        field = offsettofield(offset)
+        if field != "":
+            return(field)
+        else:
+            return("")
+
+offsettoobject = getobjectofoffset #same thing, but different name
 
 def getfieldof(index):
     index = int(index)
@@ -1633,7 +1699,7 @@ def getnamespaces(fullobjects):
             print(str(i) + "/" + str(len(fullobjects)))
         thisnamespacename = getobjectnamespace(thisobject)
         if listcontains(thisnamespacename,namespacenames):
-           thisnamespacecontent = listitem(indexofitem(thisnamespacename,namespacenames),namespacecontent)
+           thisnamespacecontent = namespacecontent[indexofitem(thisnamespacename,namespacenames) - 1]
            thisnamespacecontent.append(thisobject)
            namespacecontent = listreplaceall(namespacecontent,indexofitem(thisnamespacename,namespacenames),thisnamespacecontent)
         else:
@@ -1641,8 +1707,8 @@ def getnamespaces(fullobjects):
             namespacenames.append(thisnamespacename)
             namespacecontent.append(thisnamespacecontent)
     namespaces = {}
-    for index in range(len(namespacenames)):
-        namespaces[listitem(index,namespacenames)] = listitem(index,namespacecontent)
+    for index in enumerate(namespacenames):
+        namespaces[namespacenames[index - 1]] = [namespacecontent[index - 1]]
     return(namespaces)
 
 def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremoveblanklines = True,toremoveallblanklines = False,returntuple = True):
@@ -1664,6 +1730,7 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
         newitem = join(_objectseparator,thisitem)
         new.append(newitem)
     fullobjects = new
+    #fullobjects = tuple(map(lambda x: _objectseparator + x,fullobjects))
     if toremoveattributes: #remove compiler generated attribute, debugger generated attribute, com visible attribute, serilizable, etc.
         new = []
         i = 0
@@ -1671,23 +1738,10 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
             i = i + 1
             if multipleof(i,1000):
                 print(str(i) + "/" + str(len(fullobjects)))
-            #newitem = item
-            #lines = getlines(newitem)
-            #thisline = listitem(2,lines)
-            #if letter(1,thisline) == "[": #they all are something in brackets, so if first character is bracket, remove the 
-                #lines = removeline(2,lines)
-                #newitem = linestostring(lines)
-                #lines = getlines(newitem)
-                #thisline = listitem(2,lines)
-                #while letter(1,thisline) == "[": #there can be multiple
-                    #lines = getlines(newitem)
-                    #lines = removeline(2,lines)
-                    #newitem = linestostring(lines)
-                    #lines = getlines(newitem)
-                    #thisline = listitem(2,lines)
             newitem = removeattributes(item)
             new.append(newitem)
         fullobjects = new
+        #fullobjects = tuple(map(removeattributes,fullobjects))
         global flagremovedattributes
         flagremovedattributes = True
     if not(getshared):
@@ -1700,31 +1754,18 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
             if not(getisshared(thisitem)):
                 new.append(thisitem)
         fullobjects = new
+        #fullobjects = [thisitem for thisitem in fullobjects if not(getisshared(thisitem))]
         global flagremovedshared
         flagremovedshared = False
     if returntuple:
         return(tuple(fullobjects))
     else:
-        return(fullobjects)
+        return(list(fullobjects))
 
 def removeattributes(thisobject,toremovenewlines = False):
     global flagremovedattributes
     if flagremovedattributes:
         return(thisobject) #attributes have already been removed!
-    #lines = getlines(thisobject)
-    #thisline = listitem(2,lines)
-    #if letter(1,thisline) == "[": #they all are something in brackets, so if first character is bracket, remove the 
-        #lines = removeline(2,lines)
-        #thisobject = linestostring(lines)
-        #lines = getlines(thisobject)
-        #thisline = listitem(2,lines)
-        #while letter(1,thisline) == "[": #there can be multiple
-            #lines = getlines(thisobject)
-            #lines = removeline(2,lines)
-            #thisobject = linestostring(lines)
-            #lines = getlines(thisobject)
-            #thisline = listitem(2,lines)
-    #return(thisobject)
     lines = getlines(thisobject,False,False)
     newlines = []
     for thisline in lines:    
@@ -1734,12 +1775,21 @@ def removeattributes(thisobject,toremovenewlines = False):
                     newline = readafter(newline,_attributeend + " ")
                 else:
                     newline = readafter(newline,_attributeend)
-                if (not(newline == "") and not((checkforstringat(" " + _isoffsetstring,newline,1)) or (checkforstringat(_isoffsetstring,newline,1)))): # rva is only after we remove compiler generated etc., so it is useless
-                     newlines.append(newline)
+                if not(newline == ""): #and not((checkforstringat(" " + _isoffsetstring,newline,1)) or (checkforstringat(_isoffsetstring,newline,1)))): # rva is only after we remove compiler generated etc., so it is useless
+                    if((checkforstringat(" " + _isoffsetstring,newline,1)) or (checkforstringat(_isoffsetstring,newline,1))):
+                        newlines.append("\n")
+                newlines.append(newline)
             else:
                 newline = thisline
                 if not(toremovenewlines and (newline == "")):
-                    newlines.append(newline)
+                    if (contains("// RVA: -1 Offset: -1",newline)):
+                        if (len(newlines) == 0):
+                            newlines.append(newline)
+                        else:
+                            if not((checkforstringat(" " + _isoffsetstring,newlines[len(newlines) - 1],1)) or (checkforstringat(_isoffsetstring,newlines[len(newlines) - 1],1))):
+                                newlines.append(newline)
+                    else:
+                        newlines.append(newline)
     return(linestostring(newlines))
 
 def getuserdefinedtype(thisobject):
@@ -1884,7 +1934,7 @@ def getproperty(propertyname,propertieslist,casesensitive = False):
 
 def getfullmethodparams(thismethod):
     lines = getlines(thismethod)
-    thisline = listitem(_methodtypeline,lines)
+    thisline = lines[_methodtypeline - 1]
     fullmethodparams = readbetween(thisline,_methodparamsstart,_methodparamsend)
     return(fullmethodparams)
 
@@ -1956,7 +2006,7 @@ def replacetypenames(thistype):
 
 def getmethodtype(thismethod,replacenames = True):
     lines = getlines(thismethod)
-    thisline = listitem(_methodtypeline,lines)
+    thisline = lines[_methodtypeline - 1]
     thisline = substring(thisline,0,findstr(_methodparamsstart,thisline))
     methodtype = readbefore(thisline,_methodparamsstart)
     methodtype = methodtype.strip()
@@ -1970,28 +2020,42 @@ def getmethodtype(thismethod,replacenames = True):
     
 def getmethodname(thismethod):
     lines = getlines(thismethod)
-    thisline = listitem(_methodtypeline,lines)
+    thisline = lines[_methodtypeline - 1]
     thisline = substring(thisline,0,findstr(_methodparamsstart,thisline))
     methodname = readbefore(thisline,_methodparamsstart)
     methodname = methodname.strip()
     words = getwords(methodname)
-    methodname = listitem(len(words),words)
+    methodname = lines[len(words) - 1]
     return(methodname)
 
 def getmethodoffset(thismethod):
     lines = getlines(thismethod)
-    thisline = listitem(_methodoffsetline,lines)
+    thisline = lines[_methodoffsetline - 1]
     methodoffset = readbetween(thisline,_offsetprefix,_offsetsuffix)
     return(methodoffset)
+
+def removegenericinstmethods(fullmethods):
+    lines = getlines(fullmethods,True,True)
+    newlines = []
+    ingenericinst = False
+    for thisline in lines:
+        if thisline == _genericinstmethodstart:
+            ingenericinst = True
+        else:
+            if (thisline == _genericinstmethodend) and ingenericinst:
+                ingenericinst = False
+            else:
+                if not(ingenericinst):
+                    newlines.append(thisline)
+    return(newlines)
     
 def getmethodslist(fullmethods):
-    global methodslist
-    lines = getlines(fullmethods,True,True)
+    lines = removegenericinstmethods(fullmethods)
     methodslist = []
     if (isodd(len(lines))):
         unexpecteddumpcsformaterror("Methods section missing line or has extra line (only expected sets of 2 lines per method ie:\n         // RVA: 0x1321F3C Offset: 0x1321F3C VA: 0x1321F3C\npublic static float get_deltaTime() { }",fullmethods)
     for i in range(int(len(lines) // 2)):
-        methodslist.append(concat([listitem(int((((i + 1) * 2)) - 1),lines),listitem(int((((i + 1) * 2))),lines)],"\n"))
+        methodslist.append(concat([lines[int((((i + 1) * 2)) - 1) - 1],lines[int((((i + 1) * 2))) - 1]],"\n"))
     return(methodslist)
 
 def getmethods(methodslist):
@@ -2019,19 +2083,19 @@ def getfullmethods(thisobject):
         fullmethods = ""
         i = indexofitem(_methodsstart,lines) + 1
         start = i
-        thisitem = removewhitespace(listitem(i,lines))
+        thisitem = removewhitespace(lines[i])
         fullmethods = concat([fullmethods,thisitem],"\n")
         i = i + 1
-        thisitem = removewhitespace(listitem(i,lines))
+        thisitem = removewhitespace(lines[i])
         if not(iswhitespace(thisitem)):
                 fullmethods = concat([fullmethods,thisitem],"\n")
-                thisitem = removewhitespace(listitem(i,lines))
+                thisitem = removewhitespace(lines[i - 1])
         i = i + 1
         while not((listcontains(thisitem,_contentends) or i > (len(lines) - 1))):
             i = i + 1
             if not(iswhitespace(thisitem)):
                 fullmethods = concat([fullmethods,thisitem],"\n")
-            thisitem = removewhitespace(listitem(i,lines))
+            thisitem = removewhitespace(lines[i - 1])
     else:
         fullmethods = ""
     return(fullmethods)
@@ -2100,7 +2164,7 @@ def getfieldname(thisfield):
     fieldname = readbefore(thisfield,_fieldoffsetstart)
     fieldname = fieldname.strip()
     words = getwords(fieldname)
-    fieldname = listitem(len(words),words)
+    fieldname = lines[len(words) - 1]
     return(fieldname)
 
 def getfields(fullfields):
@@ -2149,14 +2213,14 @@ def getfullfields(thisobject):
         fullfields = ""
         i = indexofitem(_fieldsstart,lines) + 1
         start = i
-        thisitem = removewhitespace(listitem(i,lines))
+        thisitem = removewhitespace(lines[i - 1])
         fullfields = concat([fullfields,thisitem],"\n")
         i = i + 1
-        thisitem = removewhitespace(listitem(i,lines))
+        thisitem = removewhitespace(lines[i - 1])
         while not((listcontains(thisitem,_contentends) or i > (len(lines) - 1))):
             if not(iswhitespace(thisitem)):
                 fullfields = concat([fullfields,thisitem],"\n")
-            thisitem = removewhitespace(listitem(i,lines))
+            thisitem = removewhitespace(lines[i - 1])
             i = i + 1
     else:
         fullfields = ""
@@ -2170,14 +2234,14 @@ def getfullproperties(thisobject):
         fullproperties = ""
         i = indexofitem(_propertiesstart,lines) + 1
         start = i
-        thisitem = removewhitespace(listitem(i,lines))
+        thisitem = removewhitespace(lines[i - 1])
         fullproperties = concat([fullproperties,thisitem],"\n")
         i = i + 1
-        thisitem = removewhitespace(listitem(i,lines))
+        thisitem = removewhitespace(lines[i - 1])
         while not((listcontains(thisitem,_contentends) or i > (len(lines) - 1))):
             if not(iswhitespace(thisitem)):
                fullproperties = concat([fullproperties,thisitem],"\n")
-            thisitem = removewhitespace(listitem(i,lines))
+            thisitem = removewhitespace(lines[i - 1])
             i = i + 1
     else:
         fullproperties = ""
@@ -2212,7 +2276,7 @@ def getpropertyname(thisproperty):
     propertyname = readbefore(thisproperty,_propertypropertiesstart)
     propertyname = propertyname.strip()
     words = getwords(propertyname)
-    propertyname = listitem(len(words),words)
+    propertyname = lines[len(words) - 1]
     return(propertyname)
 
 def getproperties(fullproperties):
@@ -2232,8 +2296,7 @@ def getfullclasses(objects):
         i = i + 1
         if multipleof(i,1000):
             print(str(i) + "/" + str(len(fullobjects)))
-        thisobjecttype = getuserdefinedtype(thisobject)
-        if  (thisobjecttype == "class") :
+        if getuserdefinedtype(thisobject) == "class":
             fullclasses.append(thisobject)
     return(fullclasses)
 
@@ -2412,36 +2475,10 @@ def bruteforcedeobfuscateobject(thisunobfuscated):
     global _tolerance
     global objectmatches
     global obfuscated
-    #global objectmatches
-    #objectmatches = []
-    #i = 0
-    #for thisobject in objects:
-        #i = i + 1
-        #if multipleof(i,100):
-            #print(str(i) + "/" + str(len(fullobjects)))
-        #if objectscheckformatch(unobfuscated,thisobject):
-            #objectmatches.append(thisobject) #match!
-    #return(objectmatches)
-    
-    #while True:
-            #if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
-                #break
-            #lasttolerance.append((_tolerance)
-            #objectmatches = []
-            #for thisobfuscated in obfuscated:
-                #if objectscheckformatch(thisunobfuscated,thisobfuscated):
-                    #objectmatches.append(thisobfuscated)
-            #if len(objectmatches) > 1:
-                #_tolerance = _tolerance + 5
-            #elif len(objectmatches) == 0:
-                #_tolerance = _tolerance - 5
-            #else:
-                #break
-    
     lasttolerance = [999999999,9999999998,9999999997,9999999996]
     newtolerance = _tolerance
     while True:
-            if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
+            if ((lasttolerance[len(lasttolerance) - 1] == lasttolerance[len(lasttolerance) - 3]) and (lasttolerance[len(lasttolerance) - 2] == lasttolerance[len(lasttolerance) - 4])): #stuck in loop, trying to get to exactly 1 but can't
                 break
             lasttolerance.append(newtolerance)
             objectmatches = []
@@ -2459,8 +2496,6 @@ def bruteforcedeobfuscateobject(thisunobfuscated):
     for thismatch in objectmatches:
         matchnames.append(str(thismatch.get("Name")))
         matchestemp.append(thismatch)
-    #if len(matchestemp) == 1:
-        #obfuscated = listremoveitem(matchestemp[0],obfuscated)
     return(matchnames)
 
 #       Demos / Tests
@@ -2484,6 +2519,7 @@ def comparativedeobfuscationdemo(classestofind):
     unobfuscated = getobject(classestofind,fullclasses)
     endspeedtest()
     print("Unobfuscated " + str(classestofind) + " found in " + timetaken + " miliseconds.")
+    resetflags()
     #dumpcspath = (r"C:/Users/zachy/OneDrive/Documents/Work/Projects/Pixel Gun 3D/Pixel Gun 3D 22.5.0/PG3D 22.5.0 dump.cs")
     dumpcspath = obfuscateddumpcs
     loaddumpcs(dumpcspath)
@@ -2518,7 +2554,7 @@ def comparativedeobfuscationdemo(classestofind):
 ##     global _tolerance
 ##     _tolerance = 80
 ##        while True:
-##            if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
+##            if ((lasttolerance[len(lasttolerance) - 1] == lasttolerance[len(lasttolerance) - 3]) and (lasttolerance[len(lasttolerance) - 2] == lasttolerance[len(lasttolerance) - 4])): #stuck in loop, trying to get to exactly 1 but can't
 ##                break
 ##            lasttolerance.append(_tolerance)
 ##            objectmatches = []
@@ -2551,7 +2587,7 @@ def comparativedeobfuscationdemo(classestofind):
         lasttolerance = [999999999,9999999998,9999999997,9999999996]
         _tolerance = oldtolerance
         while True:
-            if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
+            if ((lasttolerance[len(lasttolerance) - 1] == lasttolerance[len(lasttolerance) - 3]) and (lasttolerance[len(lasttolerance) - 2] == lasttolerance[len(lasttolerance) - 4])): #stuck in loop, trying to get to exactly 1 but can't
                 break
             lasttolerance.append(_tolerance)
             objectmatches = []
@@ -2578,18 +2614,18 @@ def comparativedeobfuscationdemo(classestofind):
     print("Class(es) deobfuscated in " + timetaken + " miliseconds.")
     global results
     results = {}
-    for i in range(len(unobfuscatednames)):
+    for i in enumerate(unobfuscatednames):
         results[str(unobfuscatednames[i])] = list(obfuscatednames[i])
     global output
     output = ""
-    for i in range(len(unobfuscatednames)):
+    for i in enumerate(unobfuscatednames):
         output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
     return(output)
 
 
 def deobfuscateallclassesdemo():
    global _tolerance
-   #unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 Or So Unobfuscated  dump.cs"
+   #unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 dump.cs"
    #obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us 2022.7.12 dump.cs"
    #unobfuscateddumpcs = prompt("\nEnter the path to your UNOBFUSCATED dump.cs file (without quotes):")
    #obfuscateddumpcs = prompt("Enter the path to your OBFUSCATED dump.cs file (without quotes):")
@@ -2641,7 +2677,7 @@ def deobfuscateallclassesdemo():
         lasttolerance = [999999999,9999999998,9999999997,9999999996]
         _tolerance = oldtolerance
         while True:
-            if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
+            if ((lasttolerance[len(lasttolerance) - 1] == lasttolerance[len(lasttolerance) - 3]) and (lasttolerance[len(lasttolerance) - 2] == lasttolerance[len(lasttolerance) - 4])): #stuck in loop, trying to get to exactly 1 but can't
                 break
             lasttolerance.append(_tolerance)
             objectmatches = []
@@ -2668,74 +2704,11 @@ def deobfuscateallclassesdemo():
    print("All class names deobfuscated in " + timetaken + " miliseconds.")
    global results
    results = {}
-   for i in range(len(unobfuscatednames)):
+   for i in enumerate(unobfuscatednames):
        results[str(unobfuscatednames[i])] = list(obfuscatednames[i])
    global output
    output = ""
-   for i in range(len(unobfuscatednames)):
-       output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
-   return(output)
-
-def deobfuscateallclasseswithrestore():
-   import ast
-   global obfuscated
-   obfuscated = ast.literal_eval(read_file("C:/Users/zachy/OneDrive/Documents/Work/Temp Folders/Python Temps/obfuscatedobjects.txt"))
-   global unobfuscated
-   unobfuscated = ast.literal_eval(read_file("C:/Users/zachy/OneDrive/Documents/Work/Temp Folders/Python Temps/unobfuscatedobjects.txt"))
-   global _tolerance
-   startspeedtest()
-   global unobfuscatednames
-   unobfuscatednames = []
-   global obfuscatednames
-   obfuscatednames = []
-   oldtolerance = _tolerance
-   i = 0
-   for thisunobfuscated in unobfuscated:
-        i = i + 1
-        if multipleof(i,20):
-            print(str(i) + "/" + str(len(unobfuscated)))
-        if multipleof(i,50):
-            break
-        lasttolerance = [999999999,9999999998,9999999997,9999999996]
-        _tolerance = 80
-        oldtime = getrawtime()
-        while True:
-            if (getrawtime() - oldtime) > 10000:
-                break #it's taking over 10 seconds each time we deobfuscate with new tolerance. that's too long. for optimization purposes, let's give up
-            if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
-                break
-            lasttolerance.append(_tolerance)
-            objectmatches = []
-            for thisobfuscated in obfuscated:
-                if objectscheckformatch(thisunobfuscated,thisobfuscated):
-                    objectmatches.append(thisobfuscated) #match!
-            if len(objectmatches) > 1:
-                _tolerance = _tolerance + 5
-            elif len(objectmatches) == 0:
-                #_tolerance = _tolerance - 5
-                break #for speed
-            else:
-                break
-            oldtime = getrawtime()
-        unobfuscatednames.append(str(thisunobfuscated.get("Name")))
-        matchnames = []
-        matchestemp = []
-        for thismatch in objectmatches:
-            matchnames.append(str(thismatch.get("Name")))
-            matchestemp.append(thismatch)
-        obfuscatednames.append(matchnames)
-        #if len(matchestemp) == 1:
-            #obfuscated = listremoveitem(matchestemp[0],obfuscated)
-   _tolerance = oldtolerance
-   endspeedtest()
-   print("All class names deobfuscated in " + timetaken + " miliseconds.")
-   global results
-   results = {}
-   for i in range(len(unobfuscatednames)):
-       results[str(unobfuscatednames[i])] = list(obfuscatednames[i])
-   global output
-   output = ""
-   for i in range(len(unobfuscatednames)):
+   for i in enumerate(unobfuscatednames):
        output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
    return(output)
 
@@ -2745,21 +2718,24 @@ def builddeobfuscationoutput():
    global unobfuscatednames
    global obfuscatednames
    results = {}
-   for i in range(len(unobfuscatednames)):
+   for i in enumerate(unobfuscatednames):
        results[str(unobfuscatednames[i])] = list(obfuscatednames[i])
    output = ""
-   for i in range(len(unobfuscatednames)):
+   for i in enumerate(unobfuscatednames):
        output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
    return(output)
 
 
 def test():
-   deobfuscateallclasseswithrestore()
+    getfullobjects(dumpcs,False)
+    resetflags()
 
 def test2():
-   deobfuscateallclasseswithrestore()
+   getfullobjects(dumpcs,False)
 
 def timetest(times = 100):
+    import gc
+    gc.disable()
     averagetime = []
     for i in range(times):
         speedtest.start()
@@ -2782,13 +2758,14 @@ print("Note: The program may have errors, get stuck in infinite loops, or not wo
 depending on your device. Be patient - it is worth the wait!")
 init()
 #a = "// Namespace: \ninternal static class 一丐世丟丒丞丄与世 // TypeDefIndex: 13480\n{\n	// Fields\n	private static float 丘与丆且丁专丅丁丛; // 0x0\n	[CompilerGeneratedAttribute] // RVA: 0x1D85380 Offset: 0x1D85380 VA: 0x1D85380\n	private static Dictionary<string, float> <世丝丒丂丝与一丐不>k__BackingField; // 0x8\n	private static bool 世丝丄丑丁丆丄三业; // 0x10\n\n	// Properties\n	internal static Dictionary<string, float> 丞丂业丅丐三丁七丞 { get; set; }\n	private static bool 业丁丈丑丟丝丘丟世 { get; }\n	internal static string 丝丟三丌丁七三不丈 { get; }\n	internal static string 丗丑丞七万业丏丈丞 { get; }\n	internal static string 丌上丌丆上与丘丘丘 { get; }\n	internal static string 丟丟丛世不万且万丙 { get; }\n	internal static string 丁且丈丌丁丁丙丏与 { get; }\n	internal static bool 七不丝三世丑丂不丐 { get; set; }\n	internal static float 丟上丆丕丛丕专丗与 { get; set; }\n	internal static float 万丌不丈丂丈东丂丄 { get; }\n	internal static bool 丈万七与丙与下丆丁 { get; }\n	internal static bool 一丅丞丘专丌丒业丌 { get; }\n	internal static float 丏丙丝丆丄下丐不丗 { get; }\n	internal static float 丛丌世丆丁业且丈丈 { get; }\n	internal static float 丄丘丂丗丘丈与丘丞 { get; }\n	internal static float 与下万且丑丁东三与 { get; }\n	internal static float 丗丕与丆丘不丂万专 { get; }\n	internal static bool 丄下丛丌不丁业七丟 { get; }\n	internal static float 三且丂丏丄业丐与丏 { get; }\n	internal static float 丈七丟丈一与一一丑 { get; }\n	internal static bool 丅丂下丈一不丌丑丒 { get; }\n	internal static bool 丐丕丑丐专上丂丅丅 { get; }\n	internal static bool 丝万万七七丕不丒东 { get; }\n	internal static bool 一丐丅丈丈丕丆业世 { get; }\n	internal static bool 丑丑丆丂万万丆丕丂 { get; }\n	internal static bool 万丝丈专三丌业丏丞 { get; }\n	internal static bool 不且下丐丈丂七丗业 { get; }\n	internal static bool 世万丗上世丅丁三丕 { get; }\n	internal static bool 丛丞丒一上丂丘丌三 { get; }\n	internal static bool 丗与丂丗丆丈丌万万 { get; }\n	internal static bool 丞东专东一丆丌丁丟 { get; }\n	internal static bool 丙丕一丈一丐丐丏三 { get; }\n	internal static bool 丂丙丅与丑丙且丁丞 { get; }\n	internal static bool 丛丌丄下业丒丂丝丂 { get; }\n	private static bool 与东丒不丅丙万丘丂 { get; }\n\n	// Methods\n\n	// RVA: 0x4095680 Offset: 0x4095680 VA: 0x4095680\n	private static void .cctor() { }\n\n	[CompilerGeneratedAttribute] // RVA: 0x1DF9AC4 Offset: 0x1DF9AC4 VA: 0x1DF9AC4\n	// RVA: 0x4095A90 Offset: 0x4095A90 VA: 0x4095A90\n	internal static Dictionary<string, float> 业世丞丙丆万丙东丛() { }\n\n	[CompilerGeneratedAttribute] // RVA: 0x1DF9AD4 Offset: 0x1DF9AD4 VA: 0x1DF9AD4\n	// RVA: 0x4095A24 Offset: 0x4095A24 VA: 0x4095A24\n	private static void 丟下业三下万万下下(Dictionary<string, float> 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x4095AF8 Offset: 0x4095AF8 VA: 0x4095AF8\n	private static bool 丁丂丞丁丗业丐一丄() { }\n\n	// RVA: 0x4095C54 Offset: 0x4095C54 VA: 0x4095C54\n	internal static string 上与丏丁世丈丝丐丟() { }\n\n	// RVA: 0x4095D48 Offset: 0x4095D48 VA: 0x4095D48\n	internal static string 丌万丕世丒丑丛东世() { }\n\n	// RVA: 0x4095E3C Offset: 0x4095E3C VA: 0x4095E3C\n	internal static string 上丏下丄世上专丙丆() { }\n\n	// RVA: 0x4095F30 Offset: 0x4095F30 VA: 0x4095F30\n	internal static string 丝七上丅且丅三一丏() { }\n\n	// RVA: 0x4096024 Offset: 0x4096024 VA: 0x4096024\n	internal static string 东且丑专丁且丈丈丝() { }\n\n	// RVA: 0x40960C4 Offset: 0x40960C4 VA: 0x40960C4\n	internal static bool 上丗丗与丗丝丑丏丆() { }\n\n	// RVA: 0x409612C Offset: 0x409612C VA: 0x409612C\n	internal static void 不丕三丅丈丅丛七丝(bool 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x409619C Offset: 0x409619C VA: 0x409619C\n	internal static float 丞一上丕丕丅丞丙丅() { }\n\n	// RVA: 0x4096204 Offset: 0x4096204 VA: 0x4096204\n	internal static void 且丁下丙丝七丂世丗(float 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x4096324 Offset: 0x4096324 VA: 0x4096324\n	internal static float 丆丞丘丟丞丛专三丈() { }\n\n	// RVA: 0x4096EF4 Offset: 0x4096EF4 VA: 0x4096EF4\n	internal static bool 专丝不丝丗世丞丕丂() { }\n\n	// RVA: 0x4096F74 Offset: 0x4096F74 VA: 0x4096F74\n	internal static bool 世丟且万丐丆与丏丘() { }\n\n	// RVA: 0x409775C Offset: 0x409775C VA: 0x409775C\n	internal static float 丄丂丄丙丑丈丞丌一() { }\n\n	// RVA: 0x4097B10 Offset: 0x4097B10 VA: 0x4097B10\n	internal static float 丅丝丄丏丕丝与丐下() { }\n\n	// RVA: 0x4097D04 Offset: 0x4097D04 VA: 0x4097D04\n	internal static float 丏丝丛丏万丙业丌丈() { }\n\n	// RVA: 0x4097D8C Offset: 0x4097D8C VA: 0x4097D8C\n	internal static float 万丛丐东丂丅丑业三() { }\n\n	// RVA: 0x4097F8C Offset: 0x4097F8C VA: 0x4097F8C\n	internal static float 上丐丆业丆丐与丝丗() { }\n\n	// RVA: 0x40984B8 Offset: 0x40984B8 VA: 0x40984B8\n	internal static bool 世丕丘丄世丆世丏世() { }\n\n	// RVA: 0x409875C Offset: 0x409875C VA: 0x409875C\n	internal static float 丌丛丙不丟丅一丆丛() { }\n\n	// RVA: 0x4098E64 Offset: 0x4098E64 VA: 0x4098E64\n	internal static float 丒丆专丑丗丆与丗丞() { }\n\n	// RVA: 0x40998D4 Offset: 0x40998D4 VA: 0x40998D4\n	internal static bool 丕业丄丞丆丛专且丑() { }\n\n	// RVA: 0x409993C Offset: 0x409993C VA: 0x409993C\n	internal static bool 丌丌且丙丗丈丄业丒() { }\n\n	// RVA: 0x40999A4 Offset: 0x40999A4 VA: 0x40999A4\n	internal static float 丟丄丙丒丗丂丗与七(int 丌丂丅丑丗且丌丞丑) { }\n\n	// RVA: 0x4099E48 Offset: 0x4099E48 VA: 0x4099E48\n	internal static float 业丕丟丑丏上丌一万(int 丞丕不不丘丗丟丄丈) { }\n\n	// RVA: 0x409A67C Offset: 0x409A67C VA: 0x409A67C\n	internal static float 丈专丙丅丕丌丄专下(int 丌丂丅丑丗且丌丞丑) { }\n\n	// RVA: 0x409A760 Offset: 0x409A760 VA: 0x409A760\n	internal static float 丙丐丅上七丒与丑业() { }\n\n	// RVA: 0x409A7F4 Offset: 0x409A7F4 VA: 0x409A7F4\n	internal static float 丝东下下丂丞上丕丟() { }\n\n	// RVA: 0x409A888 Offset: 0x409A888 VA: 0x409A888\n	internal static float 下丕丅下世且一东七() { }\n\n	// RVA: 0x409A91C Offset: 0x409A91C VA: 0x409A91C\n	internal static float 丁一不一万下丗丗世(int 丂丏丄且丂专业万丟) { }\n\n	// RVA: 0x409C4A4 Offset: 0x409C4A4 VA: 0x409C4A4\n	internal static float 丌丐专下丘一丑不丞(int 丂丏丄且丂专业万丟) { }\n\n	// RVA: 0x409C53C Offset: 0x409C53C VA: 0x409C53C\n	internal static float 一丆丘与业东丅与丟(string 丗下丏三东七丞专东) { }\n\n	// RVA: 0x409C9B0 Offset: 0x409C9B0 VA: 0x409C9B0\n	internal static float 与万丌专一一不丌丘(WeaponSounds 丅丏丆丆且丒世上丁, string 丗丑丞七万业丏丈丞, string 丌上丌丆上与丘丘丘, string 丟丟丛世不万且万丙) { }\n\n	// RVA: 0x409CF00 Offset: 0x409CF00 VA: 0x409CF00\n	internal static float 丐丘丗丞专丒一丟丝(int 丞下丛丆万与且丘丒) { }\n\n	// RVA: 0x409D6EC Offset: 0x409D6EC VA: 0x409D6EC\n	internal static float 丙东丟丁东丘丆七丞(int 不丏丞丗丞三丅丄丝, string 丗丑丞七万业丏丈丞, string 丌上丌丆上与丘丘丘, string 丟丟丛世不万且万丙) { }\n\n	// RVA: 0x409DBBC Offset: 0x409DBBC VA: 0x409DBBC\n	internal static float 丙业下丄丕且丝丙三() { }\n\n	// RVA: 0x409DC2C Offset: 0x409DC2C VA: 0x409DC2C\n	internal static float 世丈丂丑丝丘丂丛专() { }\n\n	// RVA: 0x409DC9C Offset: 0x409DC9C VA: 0x409DC9C\n	internal static float 下丙万丆丗丝专丙丝() { }\n\n	// RVA: 0x409DD0C Offset: 0x409DD0C VA: 0x409DD0C\n	internal static float 丈上丁丏丂丁东专丄() { }\n\n	// RVA: 0x409E074 Offset: 0x409E074 VA: 0x409E074\n	internal static float 丙丄专七丌丛丙丏三() { }\n\n	// RVA: 0x409E168 Offset: 0x409E168 VA: 0x409E168\n	internal static bool 专一丄丛丏丗下丄三() { }\n\n	// RVA: 0x409E250 Offset: 0x409E250 VA: 0x409E250\n	internal static bool 丑上丒且一丕三业一() { }\n\n	// RVA: 0x409E338 Offset: 0x409E338 VA: 0x409E338\n	internal static bool 丘丗丆丗不丘丐上且() { }\n\n	// RVA: 0x409E420 Offset: 0x409E420 VA: 0x409E420\n	internal static bool 丆丐世丕万专丑丌丑() { }\n\n	// RVA: 0x409E508 Offset: 0x409E508 VA: 0x409E508\n	internal static bool 丞丞丒东东万丞丞丙() { }\n\n	// RVA: 0x409E5F0 Offset: 0x409E5F0 VA: 0x409E5F0\n	internal static bool 丁世丝丝一一世丘丐() { }\n\n	// RVA: 0x409E698 Offset: 0x409E698 VA: 0x409E698\n	internal static bool 丏丙东不七丑丒且丄() { }\n\n	// RVA: 0x409E740 Offset: 0x409E740 VA: 0x409E740\n	internal static bool 丈丙丅丄三丘且丈丆() { }\n\n	// RVA: 0x409E7E8 Offset: 0x409E7E8 VA: 0x409E7E8\n	internal static bool 且丄东专业与万丈万() { }\n\n	// RVA: 0x409E890 Offset: 0x409E890 VA: 0x409E890\n	internal static bool 丒丟一一丄丈丁与丑() { }\n\n	// RVA: 0x409E938 Offset: 0x409E938 VA: 0x409E938\n	internal static bool 丝丆万丝丂丌丛下丞() { }\n\n	// RVA: 0x409E9E0 Offset: 0x409E9E0 VA: 0x409E9E0\n	internal static bool 丆丙丄不业丝七万七() { }\n\n	// RVA: 0x4096E2C Offset: 0x4096E2C VA: 0x4096E2C\n	private static bool 一丟丞丆丗专专且丄() { }\n}"#deobfuscateallclassesdemo()
-#unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 Or So Unobfuscated  dump.cs"
+unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 dump.cs"
 #obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us 2022.7.12 dump.cs"
 #unobfuscateddumpcs = prompt("\nEnter the path to your UNOBFUSCATED dump.cs file (without quotes):")
 #obfuscateddumpcs = prompt("Enter the path to your OBFUSCATED dump.cs file (without quotes):")
-#dumpcspath = unobfuscateddumpcs
-#loaddumpcs(dumpcspath)
-#sys.exit()
+dumpcspath = unobfuscateddumpcs
+loaddumpcs(dumpcspath)
+timetest(1)
+sys.exit()
 deobfuscateallclassesdemo()
 #comparativedeobfuscationdemo(["Rocket"])
 #write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Outputs\output.txt",output)

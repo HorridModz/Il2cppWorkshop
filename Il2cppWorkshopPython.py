@@ -1,10 +1,5 @@
-#THIS IS A WIP. IT IS NOT DONE. DO NOT TRY TO USE IT YET.
 #TO ANYONE READING THIS: These notes are messy and unfinished - they are more like notes for my notes.
 #Do not bother reading them beyond the known bugs / limitations section.
-
-#TO ANYONE TRYING TO HELP: So far, I have finished and tested:
-#All the basic low-level string manipulation functios
-#That's it!
 
 #Wanna test and debug? Here's what to do.
 #1. Go to the bottom of the code and type init() to make sure everything is set up.
@@ -104,12 +99,14 @@
     #Finished Features:
     
     #WIP Features (please do not try to use these!)
+# - Macro / Plugin System: You can set the program to perform your own routine with user inputs. Basically, you write your own program, made of of some of your own code and some il2cppworkshop functions. Similar to il2cpp plugin system. EX: Auto-updating hex patch script: Tell user to input apk file path, then dump, deobfuscate a set class and method by comparing with a set unobfuscated dump.cs, and create a hex patch script using your set options.
+#Plugins / macros can also be uploaded and downloaded via the cloud contribution system.
 # - Infinite loop protection: These program has multiple defenses against it getting stuck in infinite loops. There is an error system, where the code checks for errors and can log the error to the console and / or visually display the error, and some errors will cause it to forcefully terminate. There is also a warning system, and a log system so you can find what went wrong. There are debugging tools and live analytics, helping you know when the program is stuck and why. In addition, loops don't just run and delay everything else: Some loops have abort systems, log things, and check if they are stuck in an infinite loop.
 # - Cloud backup system: Backup the program data to the cloud, so you do not lose your progress / data! Each ip address has their own backup folder. Make sure you do not use a vpn, and you have a static ip address, or this backup will not sync. OR maybe there will be a username and return "Not Done"word or token system. You can choose to manually backup, and automatic backups may be available from time to time, depending on the capabilities of the server hosting.
 # - Import your own files, or choose from one of the existing ones. Maybe even a cloud system where people can upload files for others?
-# - Cloud contribution system: Want to help yourself, and others? When you are done with a task, you can choose to upload the result (deobfuscated things, hex values, dump files, gameguardian scripts, etc.) to the cloud. You can upload it with a custom name. After uploading, you can access these files by searching for them in the cloud database - this way you never lose them. Even better, others can also access these files! You can also upload notes files (such as repositories of methods) to the cloud for others to use. You can also upload checkpoints, so everyone can help contribute to big and time-consuming tasks.
+# - Cloud contribution system: Want to help yourself, and others? When you are done with a task, you can choose to upload the result (deobfuscated things, hex values, dump files, gameguardian scripts, etc.) to the cloud. You can upload it with a custom name. After uploading, you can access these files by searching for them in the cloud database - this way you never lose them. Even better, others can also access these files! You can also upload notes files (such as repositories of methods) to the cloud for others to use. You can also upload checkpoints, so everyone can help contribute to big and time-consuming tasks. You can also upload useful files with apks and dump.cs files. This system also supports the cloud plugin upload / download system.
 # - Brute Force Deobfuscation (Comparitive Deobfuscation): A deobfuscation method that works by comparing unobfuscated and obfuscated dump.cs. It finds the class or member etc. by name. Then, it takes the class, and replaces the names and dynamic values with a certain string ('offset','methodname','classname','comment',etc.). This way, things such as data types, params, # of methods and fields, etc. can be compared. It then converts this into lists of methods, and each method has its method type, and the method params. Same is done on fields and class itself. There is a strikes system with a customizable strictness. It can automatically adapt by narrowing down the perfect strictness by moving it up and down and seeing how little results it can get while still getting results (the toggleable smart mode, changeable in settings or function parameters). This method takes a long time.
-# - String search deobfuscation (Static Elemenet Deobfuscation): This method is faster, simpler, and better. Both are useful though. This method finds unchanging string (such as int,float) by searching strings until it finds one with low occurences (like 300 or less), and it finds the one with the lowest. It can also remove names / dynamic values and replace with a certain string ('offset','methodname','classname','comment',etc.), but then this has to be done on both versions. Then it sees if this comes up in obfuscated. It uses brute force deobfuscation on the resulting classes methods etc. This is done until the right one is found.
+# - Regex search deobfuscation (String search deobfuscation): This method is faster, simpler, and better. Both are useful though. This method finds unchanging string (such as <int,float> and private readonly Dictionary<) by searching strings until it finds one with low occurences (like 300 or less), and it finds the one with the lowest. It can also remove names / dynamic values and uses regex search. It can also use the renamer to remove changing things. Then it sees if this comes up in obfuscated. It uses brute force deobfuscation on the resulting classes methods etc. This is done until the right one is found.
 # - Mutual Name Deobfuscation (Cross Reference Deobfuscation): This deobfuscation method is kind of like string search deobfuscation. It searches for the name you want to deobfuscate and finds other instances of the name, either as parameters in methods, methods with the same name in other classes, or fields with the same name in other classes. It tries to find one of these where the method or class is unobfuscated, or known through previous deobfuscation. Then, it goes to this class and used brute force deobfuscation to find the right method or field.
 # - Deobfuscation by name: Put in the name of a method, class, field, etc. and the program attempts to deobfuscate it by comparing unobfuscated and obfuscated dump.cs. Make sure you have get_ or set_ in front of some methods! If a method is not the found, the program looks for it with get_, and if still not, it looks for it with set_.
 # - Finding by name: Put in the name of a method, field, class etc., and the program will try to find more details about it. You can choose what details you want. Details include, fields of class, methods of class, class type, parameter of method, type of field or method, etc. 
@@ -122,7 +119,7 @@
 # - Checkpoint button: There is also a button to manually create checkpoints (see task close and resume).
 # - Hex patching tools: Method to offset, offset to hex, hex to offset, etc.
 # - Direct hex patching: Directly modify lib files by offset or hex value. You can also replace all hex values that match. You can also use numbers.
-# - Lib file analysis: Generate hex patch scripts, find hex values, search for numbers and strings, go to offsets, and more in files like libil2cpp. This is basically a hex editor (with GUI!). Inspired by HxD Workshop (HxD Hex Editor).
+# - Dump.cs and lib file analysis: Generate hex patch scripts, find hex values, search for numbers and strings, go to offsets, and more in files like libil2cpp. This is basically a hex editor (with GUI!). Inspired by HxD Workshop (HxD Hex Editor).
 # - Name remover: This features removes all names in dump.cs of unobfuscated and obfuscated. It also removes dynamic things such as offsets. This way, things match up. This is also useful for unobfuscated things, because it removes dynamic things. It can be used for things such as deobfuscating and auto-updating.
 # - Renamer: Inspired by de4dot, this feature replaces names and / or things like offsets and comments with clearer names. For example, obfuscated functions can be renamed.
 # - GG script generator: Can generate custom gg lua scripts for things such as hex patch scripts.
@@ -139,6 +136,7 @@
 # - Debugging tools: There are special debugging tools such as monitoring variables, when functions are called, etc.
 # - Warning and error system: A live warning system and an error system, so you know what goes wrong and why. You can dismiss errors, investigate errors, use debug tools in the way the error / warning suggests, and there is an ignore option and a do not show again option.
 # - 100% Open Source: All the code is clean, open source, and commented. You are free to use pieces of it with credit, modify it, etc.
+# - Auto libil2cpp dumping: Built-in perfare il2cppdumper and il2cppdumper online (https://il2cppdumper.com/the-dumper-tool), so you don't have to worry about dumping yourself!
 
 #      Errors
 #This was coded in python 3.10.4 for 64bit windows, so older or newer versions may have bugs. If something doesn't work, you can try downloading 3.10.4.
@@ -189,137 +187,104 @@
 
 #           CODE (Do not modify, delete, or add anything beyond this point unless you know what you are doing. This is the real code, not part of the documentary or manual.)
 
+#   Parts of the program edited by the program itself
+
+path = None
+
 #                Initilization
 
-# Importing all needed modules
+#   Modules required for importing other modules
 
-'''
-FOR PEOPLE MODIFYING THE CODE: Please use this template to import modules! It will give an error and force exit if the module does not exist.
+import sys
+import warnings
+import importlib
+import pip
 
-Instead of "import YOURMODULE" use:
-try:
-    import YOURMODULE
-except:
-    modulenotfounderror("YOURMODULE",True)
-    
-Instead of "from YOURMODULE import YOURSUBMODULE" use:
-try:
-    from YOURMODULE import YOURSUBMODULE
-except:
-    modulenotfounderror("submodule " + "YOURSUBMODULE" + " in " + "YOURMODULE")
-'''
+#   Importing Modules
 
-import sys #needed for importing modules themselves, due to the sys.exit block in the modulenotfounderror function   
+def modulenotfounderror(module,terminate = True):
+    print("Could not import module '" + module + "'.\
+\nSome features may not work or give errors due to this module not being installed.")
+    TRY_INSTALL = input("Would you like to try to install the module? An internet connection is required to do so.\nY\\N\n")
+    if TRY_INSTALL == "Y" or TRY_INSTALL == "y":
+        if not(install_and_import(module)):
+            print("\n\nSuccessfully installed and imported module '" + module + "' !")
+        else:
+            globals()[module + "imported"] = False
+            if terminate:
+                sys.exit()
+    else:
+        globals()[module + "imported"] = False
+        print("Could not import module '" + module + "'.")
+        if terminate:
+            sys.exit()
+def install_and_import(module):
+    INSTALL_ERROR = False
+    try:
+        importlib.import_module(module)
+    except ImportError:
+        try:
+            import pip
+            pip.main(['install', module])
+        except:
+            INSTALL_ERROR = True
+        finally:
+            if not(INSTALL_ERROR):
+                try:
+                    globals()[module] = importlib.import_module(module)
+                except:
+                    INSTALL_ERROR = True
+                    print("\n\nFailed to install module '" + module + "' due to unknown reason. Check that you have an internet connection and that your disk is not full.")
+            return(INSTALL_ERROR)
 
-def modulenotfounderror(module,terminate):
-    print("Could not import module: " + module + " because the file does not exist on your device.\
-\nPlease use https://docs.python.org/3/installing/index.html as a guide for installing this module.\
-\nSome features may not work or give errors due to this module not being installed!")
-    if terminate:
-        sys.exit("Could not import module: " + module + " because the file does not exist on your device.\
-\nPlease use https://docs.python.org/3/installing/index.html as a guide for installing this module.\
-\nSome features may not work or give errors due to this module not being installed!")
-                               
-#Debugging / ui
-ioimported = True
-try:
-    import io
-except:
-    ioimported = False
-    modulenotfounderror("io",True)
-#Clipboard
-#pyperclipimported = True
-#try:
-    #import pyperclip
-#except:
-    #pyperimported = False
-    #modulenotfounderror("requests",False)
-#UI / GUI
-#Strings and numbers
-mathimported = True
-try:
-    import math
-except:
-    mathimported = False
-    modulenotfounderror("math",True)
-randomimported = True
-try:
-    import random
-except:
-    randomimported = False
-    modulenotfounderror("random",True)
-try:
-    import string
-except:
-    stringimported = False
-    modulenotfounderror("string",True)
-#Lists, dictionaries, classes, etc.
-astimported = True
-try:
-    import ast
-except:
-    astimported = False
-    modulenotfounderror("'ast'",True)
-#Files
-ospathimported = True
-try:
-    import os.path
-except:
-    ospathimported = False
-    modulenotfounderror("os.path)")
-existsimported = True
-try:
+def importmodule(module,terminate = True):
+    globals()[module + "imported"] = True
+    try:
+        globals()[module] = importlib.import_module(module)
+    except ImportError:
+        modulenotfounderror(module,terminate)
+
+importmodule("io")
+#importmodule("pyperclip",False)
+importmodule("math")
+importmodule("random")
+importmodule("string")
+importmodule("statistics")
+importmodule("ast")
+importmodule("os")
+importmodule("time")
+importmodule("datetime")
+importmodule("timeit")
+if osimported:
     from os.path import exists
-except:
-    existsimported = False
-    modulenotfounderror("submodule " + "exists" + " in " + "os.path")
-#Cloud
-#from http.server import BaseHTTPRequestHandler, HTTPServer
-#httpserverimported = True
-#try:
-    #from http.server import BaseHTTPRequestHandler, HTTPServer
-#except:
-    #httserverimported = False
-    #modulenotfounderror("submodule " + "BaseHTTPRequestHandler, HTTPServer" + " in " + "http.request",False)
-#from html.parser import HTMLParser
-#htmpparserimported = True
-#try:
-    #from html.parse import HTMLParser
-#except:
-    #existsimported = False
-    #modulenotfounderror("submodule " + "HTMLParser" + " in " + "html.parser",False)
-#htmlparserimported = True
-#try:
-    #import request
-#except:
-    #requestimported = False
-    #modulenotfounderror("request",False)
-#Date / time
+importmodule("html",False)
+if htmlimported:
+    from html.parser import HTMLParser
 timeimported = True
-try:
-    import time
-except:
-    timeimported = False
-    modulenotfounderror("time",True)
-datetimeimported = True
-try:
-    import datetime
-except:
-    datetimeimported = False
-    modulenotfounderror("datetime",True)
 
 #   Init
 
 isinit = False
 
 def init():
-#Use tuples - they are faster for unchanging lists!
         global isinit
         isinit = True
         
-        #Restore data from last session
-        def restoredata():
+        #Restore data from last session if it exists
+        def loaddata(path):
             pass
+
+        #settings constants
+        def initsettingsconstants():
+            global defaultdumpcssettings
+            defaultdumpcssettings = {
+                "tolerance": 80,
+                "objectkeepaftercolon": False,
+                }
+            global defaultsettings
+            defaultsettings = {
+                "dumpcs": defaultdumpcssettings,
+                }
         
         #messagecontants
         def initmessageconstants():
@@ -353,49 +318,73 @@ def init():
             #whietespacechars = string.whitespace
         #dumpcsconstants            
         def initdumpcsconstants():
+            #Types Constants
             def addtypeprefixesandsuffixes(prefixes,suffixes):
-                global _valuetypes
-                old = list(_valuetypes) #store the old valuetypes, so we can add just prefixes, then just suffixes
+                global _types
+                #Capitalized
+                newtypes = list(_types) #the for loop will change when we update valuetypes, so we have to make a new array, and set valuetypes to this new array when we are done using it
+                for thistype in _types:
+                    newtypes.append(thistype.capitalize())
+                _types = newtypes #set valuetypes to the newtypes now that we are done iterating through it
+                #Lowercase
+                newtypes = list(_types) #the for loop will change when we update valuetypes, so we have to make a new array, and set valuetypes to this new array when we are done using it
+                for thistype in _types:
+                    newtypes.append(thistype.lower())
+                _types = newtypes #set valuetypes to the newtypes now that we are done iterating through it
+                #Suffixes
+                old = list(_types) #store the old valuetypes, so we can add just suffixes, then just prefixes later on, without the update list containing suffixes
                 for thissuffix in suffixes: #suffixes
                     for thistype in old: #use the old value types that have no prefixes or suffixes
-                        _valuetypes = listadd(join(thistype,thissuffix),_valuetypes)
-                newtypes = list(_valuetypes) #the for loop will change when we update valuetypes, so we have to make a new array, and set valuetypes to this new array when we are done using it
+                        _types.append(join(thistype,thissuffix))
+                #Prefixes and suffixes
+                newtypes = list(_types) #the for loop will change when we update valuetypes, so we have to make a new array, and set valuetypes to this new array when we are done using it
                 for thisprefix in prefixes: #prefixes and suffixes
-                    for thistype in _valuetypes: #use the new value types that already have suffixes, but not prefixes
-                        newtypes = listadd(join(thisprefix,thistype),newtypes)
-                _valuetypes = newtypes #set valuetypes to the newtypes now that we are done iterating through it
+                    for thistype in _types: #use the new value types that already have suffixes, but not prefixes
+                        newtypes.append(join(thisprefix,thistype))
+                _types = newtypes #set valuetypes to the newtypes now that we are done iterating through it
+                #Prefixes
                 for thisprefix in prefixes: #prefixes
                     for thistype in old: #use the old value types that have no prefixes or suffixes
-                        _valuetypes = listadd(join(thisprefix,thistype),_valuetypes)
-                
-            global _valuetypes
-            _valuetypes = ["predicate","Predicate","func","Func","new","static","public","private","internal","readonly","const","final","void","bool","byte","int16","int32","int64","uint16","uint32","uint64","char","decimal","single","double","float","int","long","sbyte","short","uint","ulong","ushort","string","array","Array","list","List","delegate","Delegate","object"]
-            typeprefixes = ["new ","<","short ","long ","?"]
-            typesuffixes = ["<>","<",">","[]","?"]
+                        _types.append(join(thisprefix,thistype))
+                #Remove duplicates
+                newtypes = [] #the for loop will change when we update valuetypes, so we have to make a new array, and set valuetypes to this new array when we are done using it
+                for thistype in _types: #use the new value types that already have suffixes, but not prefixes
+                    if not(listcontains(thistype,newtypes)):
+                        newtypes.append(thistype)
+                _types = newtypes #set valuetypes to the newtypes now that we are done iterating through it
+
+            #Types            
+            global _types
+            _types = ["virtual","dictionary","predicate","func","new","static","protected","public","private","internal","readonly","const","final","void","bool","byte","int16","int32","int64","uint16","uint32","uint64","char","decimal","single","double","float","int","long","sbyte","short","uint","ulong","ushort","string","array","Array","list","List","delegate","Delegate","object"]
+            typeprefixes = []
+            typesuffixes = ["[]","?"]
             addtypeprefixesandsuffixes(typeprefixes,typesuffixes)
-            global _hexpatchabletypes
-            _hexpatchabletypes = ["bool","byte","sybte","double","float","int","long","short","decimal"]
-            global _objecttypes #for all objects - value types and reference types
-            _objecttypes = ["abstract","concrete","sealed","static","shared","instance","partial","private","internal","inner","nested"]
-            global _referencetypes
-            _referencetypes = ["class","struct","enum","interface","union"]
-            global _typeprefixes
-            global _methodoffsetline
-            _methodoffsetline = 1
-            global _methodtypeline
-            _methodtypeline = 2
+            _types = set(_types)
+            global _objecttypes #for all objects - value types and userdefined types
+            _objecttypes = ["abstract","concrete","sealed","static","shared","instance","partial","private","protected","internal","inner","nested"]
+            _objecttypes = set(_objecttypes)
+            global _userdefinedtypes
+            _userdefinedtypes = ["class","struct","enum","interface","union"]
+            _userdefinedtypes = set(_userdefinedtypes)
+            global _typenamereplace
+            _typenamereplace = "name"
+            #Offsets constants
+            global _isoffsetstring
+            _isoffsetstring = "// RVA: "
             global _offsetprefix
             _offsetprefix = "Offset: 0x"
             global _offsetsuffix
             _offsetsuffix =  " VA: 0x"
             global _offsetlength
             _offsetlength = 6
+            #Object constants
             global _nonamespacename
             _nonamespacename = "-" #In dnspy, classes in global namespace are called "-". In dump.cs, they are called "".
             global _objectseparator
             _objectseparator = "// Namespace: "
             global _sharedobjectstrings
-            _sharedobjectstrings = [".",".<",">"," :",">a_",">b_",">c_",">d_",">e_",">f_",">g_",">h_",">i_",">j_",">k_",">l_",">m_",">n_",">o_",">p_",">q_",">r_",">s_",">t_",">u_",">v_",">w_",">x_",">y_",">z_"] #don't worry, I didn't type this out. I wrote a script to make this!
+            _sharedobjectstrings = [".<","<",">",">a_",">b_",">c_",">d_",">e_",">f_",">g_",">h_",">i_",">j_",">k_",">l_",">m_",">n_",">o_",">p_",">q_",">r_",">s_",">t_",">u_",">v_",">w_",">x_",">y_",">z_","."] #don't worry, I didn't type this out. I wrote a script to make this!
+            _sharedobjectstrings = tuple(_sharedobjectstrings)
             global _namespaceline
             _namespaceline = 1
             global _namespacenamestart
@@ -404,6 +393,11 @@ def init():
             _objecttypeline = 2
             global _objecttypeend
             _objecttypeend = " // TypeDefIndex: "
+            global _objectkeepaftercolon
+            _objectkeepaftercolon = False
+            global _objectcolon
+            _objectcolon = " :"
+            #Methods, fields, and properties constants
             global _fieldsstart
             _fieldsstart = "// Fields"
             global _propertiesstart
@@ -412,6 +406,7 @@ def init():
             _methodsstart = "// Methods"
             global _contentends
             _contentends = ["}","// Methods","// Fields","// Properties"]
+            _contentends = set(_contentends)
             global _genericintsmethodstart
             _genericintsmethodstart = "/* GenericInstMethod :"
             global _genericintsmethodend
@@ -422,6 +417,8 @@ def init():
             _datatypegroupend = ">"
             global _datatypegroupseparator
             _datatypegroupseparator = ", "
+            global _processdatatypegroups
+            _processdatatypegroups = True #more accurate, but slower
             global _fieldoffsetstart
             _fieldoffsetstart = "; // 0x"
             global _propertypropertiesstart
@@ -430,6 +427,10 @@ def init():
             _propertypropertiesend = "; }"
             global _propertypropertieseparator
             _propertypropertieseparator = "; "
+            global _methodoffsetline
+            _methodoffsetline = 1
+            global _methodtypeline
+            _methodtypeline = 2
             global _methodparamsstart
             _methodparamsstart = "("
             global _methodparamsend
@@ -440,18 +441,18 @@ def init():
             _ispropertystring = "; }"
             global _isfieldstring
             _isfieldstring = "; // 0x"
-            global _isoffsetstring
-            _isoffsetstring = "// RVA: "
+            #Attributes constants
             global _attributestart
             _attributestart = "["
             global _attributeend
             _attributeend = "]"
+            #Deobfuscation by comparison constants
             global _tolerance
-            _tolerance = float(85) #must be at least 85% similar, not considering added things
-            global _referencetypeweightfalse
-            _referencetypeweightfalse = float(999999999999999)
-            global _referencetypeweighttrue
-            _referencetypeweighttrue = float(0)
+            _tolerance = float(80) #By default, objects are preferred to have a similarity score of at least 80% to be considered a match (but this can be modified or adjusted)
+            global _userdefinedtypeweightfalse
+            _userdefinedtypeweightfalse = float(999999999999999)
+            global _userdefinedtypeweighttrue
+            _userdefinedtypeweighttrue = float(0)
             global _sharedweightfalse
             _sharedweightfalse = float(999999999999999)
             global _sharedweighttrue
@@ -465,11 +466,11 @@ def init():
             global _fieldweighttrue
             _fieldweighttrue = float(1.25)
             global _propertyweightfalse
-            _propertyweightflase = float(5)
+            _propertyweightfalse = float(5)
             global _propertyweighttrue
             _propertyweighttrue = float(1.25)
             global _objecttypeweightfalse
-            _objecttypeweightfalse = float(28)
+            _objecttypeweightfalse = float(28) #This really shouldn't change, so it hits really heavy. But I guess it is possible?
             global _objecttypeweighttrue
             _objecttypeweighttrue = float(5)
             global _typeweighttrue
@@ -488,7 +489,7 @@ def init():
             _sizebenchmark = float(4)
     #init cloud stuff
         def inithttp():
-            #referenced from https://flaviocopes.com/python-http-server/
+            #userdefinedd from https://flaviocopes.com/python-http-server/
                 global initserver
                 def initserver(port):
                     global httpserver
@@ -535,29 +536,36 @@ def init():
         initdumpcsconstants()
         initmessageconstants()
         initflags()
-        restoredata()
+        initsettingsconstants()
+        loaddata(path)
+        #settings specific to the game
+        usenamingregex = False
+        usenamingchars = False
+        namingchars = "丕世东专丛三丐丄丗丈七丒上丘丟丁丝业丏一丙丌丂不下与万且丅丑丞丆年月日년월일시분초時时分秒"
+        namingregex = "\\p{L}\\p{M}*"
+
+
         
 #            Basic functions
 
 #   Renaming default functions to make them easier to use
 
-def lengthof(thisobject):
-    return len(thisobject)
+lengthof = len
 
-def tostring(thisobject):
-    return str(thisobject)
+tostring = str
 
-def tostr(thisobject):
-    return str(thisobject)
+tostr = str
 
-def tonumber(thisobject):
-    return int(thisobject)
+tonumber = int
 
-def toint(thisobject):
-    return int(thisobject)
+tonum = int
+
+toint = int
+
+tofloat = float
 
 
-#   Basic string functions
+#   String functions
 
 def getlines(fullstr,toremoveblanklines = False,toremovewhitespace = False):
     lines = fullstr.splitlines()
@@ -567,7 +575,7 @@ def getlines(fullstr,toremoveblanklines = False,toremovewhitespace = False):
             if toremovewhitespace:
                 thisline = removewhitespace(thisline)
             if not((iswhitespace(thisline)) and toremoveblanklines):
-                newlines = listadd(thisline,newlines)
+                newlines.append(thisline)
         return(newlines)
     else:
         return(lines)
@@ -592,7 +600,7 @@ def firstletter(text):
     else:
         return (text[0])
 
-def substring(text,start,end = 99999998888888888888888888888888888888):
+def substring(text,start,end = 999999999999999999999):
     if start < 1:
         return (text[0:end])
     else:
@@ -804,7 +812,7 @@ def capitalizewords(sentence):
     words = getwords(sentence)
     newwords = []
     for word in words:
-            newwords = listadd(str(word).capitalize(),newwords)
+            newwords.append(str(word).capitalize())
     new = concat(newwords," ")
     return (new)
     
@@ -817,7 +825,155 @@ def lowerstr(fullstr,docasefold = True):
     else:
         return (str(fullstr).casefold())
 
-#   Basic list functions
+def removeline(index,lines):
+    del lines[index - 1]
+    return(lines)
+
+def linestostring(lines):
+    newstring = concat(lines,"\n")
+    return (newstring)
+
+def wordstostring(words):
+    newstring = concat(words," ")
+    return (newstring)
+
+
+def getwords(fullstr,removewhitespacefromwords = True,allwhitespace = True,tabs = True):
+    if allwhitespace:
+        words = fullstr.split()
+    else:
+        thisword = ""
+        words = []
+        for i in fullstr:
+            if ((i == "") or ((i == "    ") and tabs)):
+                if not(iswhitespace(thisword)):
+                    words.append(thisword)
+                thisword = ""
+            else:
+                thisletter = i
+                thisword = thisword + thisletter
+    if removewhitespacefromwords:
+        newwords = []
+        for item in words:
+            newwords.append(removewhitespace(item,True,True))
+        words = newwords
+    return (words)
+
+def stringtoliteralstring(fullstr):
+    online = 0
+    stringlines = getlines(fullstr,False,False)
+    encoded = "encoded = \""
+    for thisline in stringlines:
+        online = online + 1
+        encoded = encoded + (thisline.replace("\\","\\\\")).replace("\n",r"\n").replace("\"",r"\"")
+    encoded = encoded + "\""
+    return encoded
+                
+
+def removewhitespace(fullstr,beginning = True,end = True,allwhitespace = False):
+    if (fullstr == "") or (fullstr == None):
+        return("")
+    newstr = ""
+    for i in fullstr:
+        if not(iswhitespace(i)):
+            newstr = newstr + i
+    if newstr == "":
+        return ""
+    if allwhitespace: #this option removes all whitespace, so it overrides other two options. No need to do remove from beginning or end if all has already been removed!
+        newstr = ""
+        for i in fullstr:
+            if not(iswhitespace(i)):
+                newstr = newstr + i
+    else:
+        newstr = fullstr
+        if beginning:
+            i = 0
+            while (letter(i,newstr) == "") or iswhitespace(letter(i,newstr)):
+                i = increment(i)
+            newstr = substring(newstr,i,len(newstr))
+        if end:
+                i = len(newstr)
+                while iswhitespace(letter(i,newstr)):
+                    i = increment(i,False)
+                newstr = substring(newstr,1,i)
+    return (newstr)
+
+def removeblanklines(fullstr,beginning = True,end = True,allblanklines = False): #make sure you understand this function! it does not by default remove all blank lines, even though it sounds like it does
+    lines = getlines(fullstr,False,False)
+    if allblanklines: #this option removes all blank lines, so it overrides other two options. No need to do remove from beginning or end if all has already been removed!
+        newlines = []
+        for thisline in lines:
+            if not(thisline == "\n"):
+                newlines.append(i)
+    else:
+        newlines = []
+        if beginning:
+            i = 0
+            while (listitem(i,lines) == "\n"):
+                i = increment(i)
+            while i < len(lines):
+                i = increment(i)
+                newlines.append(listitem(i,lines))
+        if end:
+                lines = newlines
+                newlines = []
+                i = len(lines)
+                while (listitem(i,lines) == "\n"):
+                    i = increment(i,False)
+                while i > 1:
+                    i = increment(i,False)
+                    newlines.insert(0,listitem(i,lines))
+    newstr = linestostring(newlines)
+    return (newstr)
+    
+
+def skipspaces(fullstr,spacescount = 1,allwhitespace = True,backward = False,newstr = True):
+    def countwhitespace(fullstr,allwhitespace):
+         if allwhitespace:
+              return occurencesofanyof(whitespacechars,fullstr)
+         else:
+              return occurencesof(" ",fullstr)
+            
+def skipspaces(fullstr,spacescount = 1,allwhitespace = True,backward = False,newstr = True):
+    def countwhitespace(fullstr,allwhitespace):
+         if allwhitespace:
+                          return occurencesofanyof(whitespacechars,fullstr)
+         else:
+              return occurencesof(" ",fullstr)
+    def islastwhitespace(fullstr,allwhitespace):
+        hisletter = letter(i,fullstr)
+        if allwhitespace:
+           return (contains(thisletter,allwhitespacechars))
+        else:
+             return (thisletter == " ")
+    '''
+    if ((countwhitespace(fullstr,allwhitespace) < spacescount) or ((countwhitespace(fullstr,tabs) == spacescount) and (islastwhite(fullstr,allwhitespace)))):
+         return ""
+    else:
+         newstr = ""
+         i = 0
+         counted = 0
+    '''
+    counted = 0
+    new = fullstr
+    iteration #unused, just for the for loop
+    for iteration in range(spacescount):
+        oldlen = len(new)
+        if allwhitespace:
+                new = readuntil(allwhitespace,new,0,backward,False,True)
+                new = readuntilnot(allwhitespace,new,0,backward,False,True)
+        else:
+                new = readuntil(" ",fullstr,0,backward,False,True)
+                new = readuntilnot(" ",fullstr,0,backward,False,True)
+                newlen = len(new)
+                counted = oldlen - newlen
+    if newstr:
+        return new
+    else:
+        return counted
+         
+
+#   List functions
 
 def listcontainslist(list1,list2,strikes = 0):
     strikecount = 0
@@ -834,12 +990,12 @@ def listcontains(item,thislist,casesensitive = True):
         item = lowerstr(item)
         newlist = []
         for thisitem in thislist:
-            newlist = listadd(lowerstr(thisitem),newlist)
+            newlist.append(lowerstr(thisitem))
         thislist = newlist
     return(item in thislist)
 
 def listremoveindex(index,thislist):
-    del thislist[index - 1:index - 1]
+    del thislist[index - 1:index]
     return(thislist)
 
 def listrandom(thislist): #pick random item from list
@@ -891,40 +1047,23 @@ def listreplaceindex(thislist,index,new):
         listremoveindex(i,thislist) '''
     thislist[index - 1] = new
     return (thislist)
-
-def listcointains(item,thislist):
-    i = 0
-    found = True
-    i = increment(i)
-    while str(thislist[i - 1]) != str(item):
-        i = increment(i)
-        if i > len(thislist):
-            found = False
-            break
-    return (found)
     
 def indexofitem(item,thislist):
     if len(thislist) == 0:
-        found = False
-        return -1
-    i = 0
-    found = True
-    i = increment(i)
-    while thislist[i - 1] != item:
-        i = increment(i)
-        if i > len(thislist):
-            found = False
-            break
-    if found:
-            return i #- 1
-    else:
-        return -1
+        return(-1)
+    try:
+        return(thislist.index(item) + 1)
+    except:
+        return(-1)
 
 def listitembyname(itemname,namelist,wantedlist):
-    return listitem(indexofitem(itemname,jnamelist),wantedlist)
+    return listitem(indexofitem(itemname,namelist),wantedlist)
 
 def listadd(item,thislist):
-    thislist.append(item)
+    if type(thislist) == set:
+        thislist.add(item)
+    else:
+        thislist.append(item)
     return(thislist)
     
 def listinsert(item,index,thislist):
@@ -942,7 +1081,7 @@ def listitem(i,thislist):
 item = listitem #same thing but different name
 numberofitem = indexofitem #same thing but different name
 
-#   Basic dictionary functions
+#   Dictionary functions
 
 def dictitem(key,thisdict):
     return(thisdict.get(key))
@@ -964,12 +1103,19 @@ def stringtodict(thisstring):
     return(ast.literal_eval(thisstring))
 
 
-#   Basic variable functions
+#  Variable functions
 
 def variableexists(varname):
-    return(listcontains(varname,globals()))   
+    return(listcontains(varname,globals()))
 
-#   Basic math functions
+def globalvars():
+    return(globals())
+
+class variable:
+    exists = variableexists
+    globalvars = globalvars
+
+#   Math functions
 
 def increment(val,forward = True,step = 1):
     if forward:
@@ -996,16 +1142,22 @@ def floor(x):
     return(math.floor(x))
 
 def ceiling(x):
-    return(math.ceiling(x))
+    return(math.ceil(x))
 
 floorof = floor #same thing, but different name
 ceilingof = ceiling #same thing, but different name
+ceil = ceiling #same thing, but different name
+ceilof = ceiling #same thing, but different name
 even = iseven #same thing, but different name
 odd = isodd #same thing, but different name
 isdivisibleby = divisibleby #same thing, but different name
 divisible = divisibleby #same thing, but different name
 multipleof = divisibleby #same thing, but different name
 ismultipleof = divisibleby #same thing, but different name
+average = statistics.mean #same thing, but different name
+averageof = statistics.mean #same thing, but different name
+meanof = statistics.mean #same thing, but different name
+mean = statistics.mean  #same thing, but different name
 
 def randomnum(minnum,maxnum,decimalplaces = 0,step = 1):
         minnum = int(minnum) #make sure they are numbers and not strings so random function works
@@ -1034,11 +1186,7 @@ def hextodec(hexvalue):
         hexvalue = substring(hexvalue,3) #remove 0x at beginning
     return (int(hexvalue,16))
 
-
-
-
-
-#   Basic file functions
+#   File functions
 
 def read_file(path,readtype = "r"):
     if not(fileexists(path)):
@@ -1076,7 +1224,7 @@ def openfile(path,opentype,encoding = "utf8"):
                filenotfounderror(path)
                return None
     file = None
-    if opentype == "rb":
+    if contains("b",opentype):
         file = open(path, str(opentype))
     else:
         try:
@@ -1097,7 +1245,7 @@ def openfile(path,opentype,encoding = "utf8"):
                unknownfileopenerror()
                return None
     return(file)
-    
+
 
 def buildpath(directory,name):
     return concat([directory,"\\",name])
@@ -1112,10 +1260,17 @@ def filetostring(path):
     thisfile = open(path,"r")
     for thisline in thisfile.readlines():
         online = online + 1
+    return(encoded)
 
-    return encoded
+class filemanager:
+    read = read_file
+    write = write_file
+    openfile = openfile
+    exists = fileexists
+    buildpath = buildpath
+    filetostring = filetostring
     
-#Basic date / time functions
+#   Date / time functions
 
 def gettime(timeparam = True,dateparam = False):
     if timeparam:
@@ -1143,9 +1298,6 @@ def formattime(rawtime,timeparam = True,dateparam = False):
 def getrawtime(): #time in miliseconds
     return (int(time.time()*1000)) #localtime only returns seconds, not miliseconds
 
-
-#Basic UI / Debugging / Error-Handling Functions
-
 def waitmili(miliseconds):
     time.sleep(miliseconds / 1000)
 
@@ -1163,11 +1315,39 @@ def startspeedtest():
     starttime = getrawtime()
 
 def endspeedtest():
-    global endtime #unformatted int
-    endtime = getrawtime() - starttime #miliseconds
+    speedtesttime = getrawtime() - starttime #unformatted int in miliseconds
+    global endtime #global
+    endtime = speedtesttime
+    speedtesttimetaken = str(endtime)  #formatted string | to-do: make formatted
     global timetaken
-    timetaken = str(endtime) #formatted string to-do: make formatted
-    return(timetaken)
+    timetaken = speedtesttimetaken #global
+    return(speedtesttimetaken)
+
+class timemanager:
+    rawtime = getrawtime
+    formattime = formattime
+    gettime = gettime
+    sleepseconds = sleepseconds
+    wait = waitseconds
+    waitmili = waitmili
+    waitseconds = waitseconds
+    sleep = sleepseconds
+    sleepmili = sleepmili
+    sleepseconds = sleepseconds
+    startspeedtest = startspeedtest
+    endspeedtest = endspeedtest
+    global speedtest
+    class speedtest:
+        start = startspeedtest
+        end = endspeedtest
+        def timetaken(formatted = True):
+            if formatted:
+                return(timetaken)
+            else:
+                return(endtime)
+        time = timetaken
+
+#   IO Functions
 
 def prompt(ask = ""):
     answer = input(str(ask) + "\n")
@@ -1178,171 +1358,32 @@ def cleario():
     print("\nNot done, idk how!\n")
 
 outputtext = print #same thing, but different name
-
 flushio = cleario #same thing, different name
+clearconsole = cleario  #same thing, but different name
+
+class console:
+    prompt = prompt
+    output = outputtext
+    clear = cleario
+    flush = cleario
 
 
-#            Higher level / more advanced functions
+#            Higher level functions
 
-#   Higher level / more advanced string functions
+#   Settings
 
-def removeline(index,lines):
-    newlines = []
-    i = 0
-    for item in lines:
-        i = increment(i)
-        if i != index:
-            newlines = listadd(item,newlines)
-    return(newlines)
-
-def linestostring(lines):
-    newstring = concat(lines,"\n")
-    return (newstring)
-
-def wordstostring(words):
-    newstring = concat(words," ")
-    return (newstring)
-
-
-def getwords(fullstr,removewhitespacefromwords = True,allwhitespace = True,tabs = True):
-    if allwhitespace:
-        words = fullstr.split()
-    else:
-        thisword = ""
-        words = []
-        for i in fullstr:
-            if ((i == "") or ((i == "    ") and tabs)):
-                if not(iswhitespace(thisword)):
-                    words = listadd(thisword,words)
-                thisword = ""
-            else:
-                thisletter = i
-                thisword = thisword + thisletter
-    if removewhitespacefromwords:
-        newwords = []
-        for item in words:
-            newwords = listadd(removewhitespace(item,True,True),newwords)
-        words = newwords
-    return (words)
-
-def stringtoliteralstring(fullstr):
-    online = 0
-    stringlines = getlines(fullstr,False,False)
-    encoded = "encoded = \""
-    for thisline in stringlines:
-        online = online + 1
-        encoded = encoded + (thisline.replace("\\","\\\\")).replace("\n",r"\n").replace("\"",r"\"")
-    encoded = encoded + "\""
-    return encoded
-                
-
-def removewhitespace(fullstr,beginning = True,end = True,allwhitespace = False):
-    if (fullstr == "") or (fullstr == None):
-        return("")
-    newstr = ""
-    for i in fullstr:
-        if not(iswhitespace(i)):
-            newstr = newstr + i
-    if newstr == "":
-        return ""
-    if allwhitespace: #this option removes all whitespace, so it overrides other two options. No need to do remove from beginning or end if all has already been removed!
-        newstr = ""
-        for i in fullstr:
-            if not(iswhitespace(i)):
-                newstr = newstr + i
-    else:
-        newstr = fullstr
-        if beginning:
-            i = 0
-            while (letter(i,newstr) == "") or iswhitespace(letter(i,newstr)):
-                i = increment(i)
-            newstr = substring(newstr,i,len(newstr))
-        if end:
-                i = len(newstr)
-                while iswhitespace(letter(i,newstr)):
-                    i = increment(i,False)
-                newstr = substring(newstr,1,i)
-    return (newstr)
-
-def removeblanklines(fullstr,beginning = True,end = True,allblanklines = False): #make sure you understand this function! it does not by default remove all blank lines, even though it sounds like it does
-    lines = getlines(fullstr,False,False)
-    if allblanklines: #this option removes all blank lines, so it overrides other two options. No need to do remove from beginning or end if all has already been removed!
-        newlines = []
-        for i in lines:
-            if not(i == "\n"):
-                newlines = listadd(i,newlines)
-    else:
-        newlines = []
-        if beginning:
-            i = 0
-            while (listitem(i,lines) == "\n"):
-                i = increment(i)
-            while i < len(lines):
-                i = increment(i)
-                newlines = listadd(listitem(i,lines),newlines)
-        if end:
-                lines = newlines
-                newlines = []
-                i = len(lines)
-                while (listitem(i,lines) == "\n"):
-                    i = increment(i,False)
-                while i > 1:
-                    i = increment(i,False)
-                    newlines = listinsert(listitem(i,lines),1,newlines)
-    newstr = linestostring(newlines)
-    return (newstr)
+class settingsmanager():
     
+    def init():
+        global currentsettings
+        currentsettings = defaultsettings
+        
+        
+    def update(settingname,new):
+        global currentsettings
+        currentsettings[settingname] = new
 
-def skipspaces(fullstr,spacescount = 1,allwhitespace = True,backward = False,newstr = True):
-    def countwhitespace(fullstr,allwhitespace):
-         if allwhitespace:
-                          return occurencesofanyof(whitespacechars,fullstr)
-         else:
-              return occurencesof(" ",fullstr)
-            
-def skipspaces(fullstr,spacescount = 1,allwhitespace = True,backward = False,newstr = True):
-    def countwhitespace(fullstr,allwhitespace):
-         if allwhitespace:
-                          return occurencesofanyof(whitespacechars,fullstr)
-         else:
-              return occurencesof(" ",fullstr)
-    def islastwhitespace(fullstr,allwhitespace):
-        hisletter = letter(i,fullstr)
-        if allwhitespace:
-           return (contains(thisletter,allwhitespacechars))
-        else:
-             return (thisletter == " ")
-    '''
-    if ((countwhitespace(fullstr,allwhitespace) < spacescount) or ((countwhitespace(fullstr,tabs) == spacescount) and (islastwhite(fullstr,allwhitespace)))):
-         return ""
-    else:
-         newstr = ""
-         i = 0
-         counted = 0
-    '''
-    counted = 0
-    new = fullstr
-    iteration #unused, just for the for loop
-    for iteration in spacescount:
-        oldlen = len(new)
-        if allwhitespace:
-                new = readuntil(allwhitespace,new,0,backward,False,True)
-                new = readuntilnot(allwhitespace,new,0,backward,False,True)
-        else:
-                new = readuntil(" ",fullstr,0,backward,False,True)
-                new = readuntilnot(" ",fullstr,0,backward,False,True)
-                newlen = len(new)
-                counted = oldlen - newlen
-    if newstr:
-        return new
-    else:
-        return counted
-         
-
-
-#       Basic functions for the project
-
-#   Basic error-handling / log functions
+#   Error-handling / log functions
 
 def warning(message,actions= ["log","print"]):
     #log, print, printlog, printcurrentsublog, terminate, stop current function, etc.
@@ -1365,9 +1406,9 @@ def log(logtype,message,time = True,date = False):
         else:
             tolog = str(gettime()) + ": " + tolog
     global projectlog
-    projectlog = listadd(str(message),projectlog)
+    projectlog.append(str(message))
 
-#   Basic lib functions
+#   Lib functions
 
 def offsettohex(offset,filepath,hexbytes = 24):
     libfile = openfile(filepath,'rb')
@@ -1375,7 +1416,7 @@ def offsettohex(offset,filepath,hexbytes = 24):
     libfile.seek(findoffset)
     return (libfile.read(int(hexbytes)).hex().upper())
 
-def offsetstolist(offsetlist,filepath,hexbytes = 24):
+def offsetstolist(offsetlist,filepath,hexbytes = 24,returntuple = True):
     if type(offsetlist) == str:
         if (len(offsetlist) > _offsetlength):
             if letter(_offsetlength + 1,offsetlist) == " ":
@@ -1400,8 +1441,11 @@ def offsetstolist(offsetlist,filepath,hexbytes = 24):
         offsets = offsetlist
     hexlist = []
     for offset in offsetlist:
-        hexlist = listadd(offsettohex(offset,filepath,hexbytes),hexlist)
-    return (hexlist)
+        hexlist.append(offsettohex(offset,filepath,hexbytes))
+    if returntuple:
+        return(hexlist)
+    else:
+        return(hexlist)
 
 offsetstohex = offsetstolist #same thing, but different name
 offsetstohexlist = offsetstolist #same thing, but different name
@@ -1442,8 +1486,7 @@ def loaddumpcs(path):
     global dumpcs
     dumpcs = read_file(path)
 
-#Functions for getting methods, classes, fields, structs, etc. from dump.cs through string manipulation
-
+#   Dump.cs functions
 def getobjectof(index):
     index = int(index)
     global dumpcs #local dumpcs defaults to global dumpcs if not defined manually
@@ -1582,7 +1625,6 @@ def getnamespaces(fullobjects):
     global namespacecontent
     global namespaces
     namespacenames = []
-    #namespacenames = listadd("",namespacenames) #one namespace name is always blank. dnspy calls this "-".
     namespacecontent = [] #list of lists (each namespace has list of classes in it)
     i = 0
     for thisobject in fullobjects:
@@ -1592,22 +1634,22 @@ def getnamespaces(fullobjects):
         thisnamespacename = getobjectnamespace(thisobject)
         if listcontains(thisnamespacename,namespacenames):
            thisnamespacecontent = listitem(indexofitem(thisnamespacename,namespacenames),namespacecontent)
-           thisnamespacecontent = listadd(thisobject,thisnamespacecontent)
+           thisnamespacecontent.append(thisobject)
            namespacecontent = listreplaceall(namespacecontent,indexofitem(thisnamespacename,namespacenames),thisnamespacecontent)
         else:
             thisnamespacecontent = [thisobject]
-            namespacenames = listadd(thisnamespacename,namespacenames)
-            namespacecontent = listadd(thisnamespacecontent,namespacecontent)
+            namespacenames.append(thisnamespacename)
+            namespacecontent.append(thisnamespacecontent)
     namespaces = {}
     for index in range(len(namespacenames)):
         namespaces[listitem(index,namespacenames)] = listitem(index,namespacecontent)
     return(namespaces)
 
-def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremoveblanklines = True,toremoveallblanklines = False):
+def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremoveblanklines = True,toremoveallblanklines = False,returntuple = True):
     global fullobjects
-    #fullobjects = splitstr(dumpcs,"// Namespace: ")
     fullobjects = splitstr(dumpcs,_objectseparator)
-    fullobjects = listremoveindex(1,fullobjects) #classes start with "// Namespace: ", so namespace gets everything before it. This means the first one will always go
+    if len(fullobjects) > 0:
+        del fullobjects[0] #classes start with "// Namespace: ", so namespace gets everything before it. This means the first one will always go
     if toremoveblanklines:
         new = []
         for thisitem in fullobjects: #remove blank lines
@@ -1615,13 +1657,12 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
                 newitem = removeblanklines(thisitem,True,True,True)
             else:
                 newitem = removeblanklines(thisitem)
-            new = listadd(newitem,new)
+            new.append(newitem)
         fullobjects = new
     new = []
     for thisitem in fullobjects: #Add namespace back on
-        #newitem = join("// Namespace: ",thisitem)
         newitem = join(_objectseparator,thisitem)
-        new = listadd(newitem,new)
+        new.append(newitem)
     fullobjects = new
     if toremoveattributes: #remove compiler generated attribute, debugger generated attribute, com visible attribute, serilizable, etc.
         new = []
@@ -1645,7 +1686,7 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
                     #lines = getlines(newitem)
                     #thisline = listitem(2,lines)
             newitem = removeattributes(item)
-            new = listadd(newitem,new)
+            new.append(newitem)
         fullobjects = new
         global flagremovedattributes
         flagremovedattributes = True
@@ -1657,11 +1698,14 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
             if multipleof(i,1000):
                 print(str(i) + "/" + str(len(fullobjects)))
             if not(getisshared(thisitem)):
-                new = listadd(thisitem,new)
+                new.append(thisitem)
         fullobjects = new
         global flagremovedshared
         flagremovedshared = False
-    return (fullobjects)
+    if returntuple:
+        return(tuple(fullobjects))
+    else:
+        return(fullobjects)
 
 def removeattributes(thisobject,toremovenewlines = False):
     global flagremovedattributes
@@ -1691,29 +1735,28 @@ def removeattributes(thisobject,toremovenewlines = False):
                 else:
                     newline = readafter(newline,_attributeend)
                 if (not(newline == "") and not((checkforstringat(" " + _isoffsetstring,newline,1)) or (checkforstringat(_isoffsetstring,newline,1)))): # rva is only after we remove compiler generated etc., so it is useless
-                     newlines = listadd(newline,newlines)
+                     newlines.append(newline)
             else:
                 newline = thisline
                 if not(toremovenewlines and (newline == "")):
-                    newlines = listadd(newline,newlines)
+                    newlines.append(newline)
     return(linestostring(newlines))
 
-def getreferencetype(thisobject):
+def getuserdefinedtype(thisobject):
     thisobject = removeattributes(thisobject)
     global isshared
     isshared = False
-    referencetypeofobject = "Other" #in case there are no lines or no words in line 2. not found - unknown structure, so unknown object
+    userdefinedtypeofobject = "Other" #in case there are no lines or no words in line 2. not found - unknown structure, so unknown object
     lines = getlines(thisobject,False,False)
-    #words = getwords(item(_objecttypeline,lines))  #1st line is namespace, 2nd line describes object (abstract class, public enum, etc.)
     words = getwords(item(_objecttypeline,lines))  #1st line is namespace, 2nd line describes object (abstract class, public enum, etc.)
     onword = 0
     for thisword in words:
         onword = onword + 1
         if onword > len(words): #not found - unknown structure, so unknown object. This should not happen!
-            referencetypeofobject = "Other"
+            userdefinedtypeofobject = "Other"
             break
-        if listcontains(thisword,_referencetypes):
-            referencetypeofobject = thisword
+        if listcontains(thisword,_userdefinedtypes):
+            userdefinedtypeofobject = thisword
             #isshared = (contains(".<",(item(2,lines))) or contains(" :",(item(2,lines))) or contains(">.",(item(2,lines)))) #in dump cs, a shared class has '(nameofclass).,' and ' :'.
             isshared = False
             for i in _sharedobjectstrings:
@@ -1722,8 +1765,8 @@ def getreferencetype(thisobject):
                     break
             #we check for both of these because they might only have one or the other. there may be false positives, idk. I hope not!
             break
-    referencetypeofobject = referencetypeofobject.strip()
-    return(referencetypeofobject)
+    userdefinedtypeofobject = userdefinedtypeofobject.strip()
+    return(userdefinedtypeofobject)
 
 def getisshared(thisobject):
     thisobject = removeattributes(thisobject)
@@ -1737,7 +1780,7 @@ def getisshared(thisobject):
         if onword > len(words): #not found - unknown structure, so unknown object. This should not happen!
             isshared = False
             break
-        if listcontains(thisword,_referencetypes):
+        if listcontains(thisword,_userdefinedtypes):
             #isshared = (contains(".<",(item(2,lines))) or contains(" :",(item(2,lines))) or contains(">.",(item(2,lines)))) #in dump cs, a shared class has '(nameofclass).,' and ' :'.
             isshared = False
             for i in _sharedobjectstrings:
@@ -1755,14 +1798,13 @@ def getobjecttype(thisobject):
     thisobject = removeattributes(thisobject)
     typeofobject = ""
     lines = getlines(thisobject,False,False)
-    #words = getwords(item(2,lines)) #1st line is namespace, 2nd line describes object (abstract class, public enum, etc.)
     words = getwords(item(_objecttypeline,lines)) #1st line is namespace, 2nd line describes object (abstract class, public enum, etc.)
     onword = 0
     for thisword in words:
         onword = onword + 1
         if onword > len(words): #not found - unknown structure, so unknown object. This should not happen! We assume type is correct anyway.
             break
-        if listcontains(thisword,_referencetypes): #say we want public from public enum, or internal static from internal static class. we 
+        if listcontains(thisword,_userdefinedtypes): #say we want public from public enum, or internal static from internal static class. we 
             break
         typeofobject = join(typeofobject,thisword," ")
     if lastletter(typeofobject) == "": #we should have gotten a space at the end, since each time, we add the word and " ". We don't want the last space.
@@ -1772,9 +1814,7 @@ def getobjecttype(thisobject):
     
 def getobjectnamespace(thisobject):
     lines = getlines(thisobject)
-    #thisline = item(1,lines) #1st line is namespace
     thisline = item(_namespaceline,lines)
-    #namespacename = readafter(thisline,"// Namespace: ")
     namespacename = readafter(thisline,_namespacenamestart)
     namespacename = namespacename.strip()
     if namespacename == "":
@@ -1784,13 +1824,14 @@ def getobjectnamespace(thisobject):
 def getobjectname(thisobject):
     thisobject = removeattributes(thisobject)
     lines = getlines(thisobject)
-    #thisline = item(2,lines) #2nd line is about class, like public static class
-    thisline = item(_objecttypeline,lines)
-    #objectname = readbetween(thisline,join(getobjecttype(thisobject)," ",getreferencetype(thisobject)," ")," // TypeDefIndex: ")
-    objectname = readbetween(thisline,join(getobjecttype(thisobject)," ",getreferencetype(thisobject)," "),_objecttypeend)
+    thisline = item(_objecttypeline,lines) #2nd line is about class, like public static class
+    objectname = readbetween(thisline,join(getobjecttype(thisobject)," ",getuserdefinedtype(thisobject)," "),_objecttypeend)
+    if (not(_objectkeepaftercolon) and contains(_objectcolon,objectname)):
+        objectname = readbefore(objectname,_objectcolon)
+        objectname = substring(objectname,1,len(objectname) - len(_objectcolon)) #readbefore function still keeps up to the end of objectcolon, so remove that
     objectname = objectname.strip()
     return(objectname)
-
+    
 def getmethod(methodname,methodslist,casesensitive = False):
     i = 0
     for thismethod in methodslist:
@@ -1802,6 +1843,7 @@ def getmethod(methodname,methodslist,casesensitive = False):
                   "Content" : thismethod,
                   "Offset" : getmethodoffset(thismethod),
                   "Params" : getmethodparams(thismethod),
+                  "Param Types" : getmethodparamtypes(thismethod),
                   }
             return(thismethod)
     dumpcsnotfounderror(methodname)
@@ -1858,24 +1900,58 @@ def getmethodparams(thismethod):
            ingroup = False
         if (not(ingroup) and (thisletter == ",")):
             if (thisparam != ""):
-                methodparams = listadd(thisparam.strip(),methodparams)
+                methodparams.append(thisparam.strip())
                 thisparam = ""
         else:
             thisparam = (thisparam + thisletter)
     if (thisparam != ""):
-                methodparams = listadd(thisparam.strip(),methodparams)
+                methodparams.append(thisparam.strip())
                 thisparam = ""
     return(methodparams)
 
+def getmethodparamtypes(thismethod,replacenames = True):
+    #methodparams = getwords(getfullmethodparams(thismethod))
+    methodparams = getmethodparams(thismethod)
+    newparams = []
+    for thisparam in methodparams:
+        for thisword in getwords(thisparam):
+            newparams.append(thisword)
+    methodparams = newparams
+    if replacenames:
+        methodparams = replacetypenames(methodparams)
+    return(methodparams)
+
 def replacetypenames(thistype):
-    words = getwords(thistype)
+    if _processdatatypegroups:
+        #Convert to string
+        if type(thistype) == list:
+            thistype = wordstostr(thistype)
+        #Replace data type groups
+        newtypes = ""
+        for thisletter in thistype:
+                if (thisletter == _datatypegroupstart) or (thisletter == _datatypegroupend) or (thisletter == _datatypegroupseparator) :
+                	newtypes = newtypes + " "
+                else:
+                	newtypes = newtypes  + thisletter
+        #Convert to list of words
+        words = getwords(newtypes)
+    else:
+        #Convert to list of words
+        if type(thistype) == str:
+            words = getwords(thistype)
+        else:
+            words = thistype
+    #Replace names
     newwords = []
     for thisword in words:
-        if not(listcontains(thisword,_valuetypes)):
-            newwords = listadd("name",newwords)
+        if not(listcontains(thisword,_types)):
+            newwords.append(_typenamereplace)
         else:
-            newwords = listadd(thisword,newwords)
-    newtype = wordstostring(newwords)
+            newwords.append(thisword)
+    if type(thistype) == str:
+        newtype = wordstostring(newwords)
+    else:
+        newtype = newwords
     return(newtype)
 
 def getmethodtype(thismethod,replacenames = True):
@@ -1885,7 +1961,8 @@ def getmethodtype(thismethod,replacenames = True):
     methodtype = readbefore(thisline,_methodparamsstart)
     methodtype = methodtype.strip()
     words = getwords(methodtype)
-    words = listremoveindex(len(words),words)
+    if len(words) > 0:
+        del words[len(words) - 1]
     methodtype = wordstostring(words)
     if replacenames:
         methodtype = replacetypenames(methodtype)
@@ -1907,15 +1984,33 @@ def getmethodoffset(thismethod):
     methodoffset = readbetween(thisline,_offsetprefix,_offsetsuffix)
     return(methodoffset)
     
-def getmethods(fullmethods):
-    global methods
+def getmethodslist(fullmethods):
+    global methodslist
     lines = getlines(fullmethods,True,True)
-    methods = []
+    methodslist = []
     if (isodd(len(lines))):
         unexpecteddumpcsformaterror("Methods section missing line or has extra line (only expected sets of 2 lines per method ie:\n         // RVA: 0x1321F3C Offset: 0x1321F3C VA: 0x1321F3C\npublic static float get_deltaTime() { }",fullmethods)
     for i in range(int(len(lines) // 2)):
-        methods = listadd(concat([listitem(int((((i + 1) * 2)) - 1),lines),listitem(int((((i + 1) * 2))),lines)],"\n"),methods)
+        methodslist.append(concat([listitem(int((((i + 1) * 2)) - 1),lines),listitem(int((((i + 1) * 2))),lines)],"\n"))
+    return(methodslist)
+
+def getmethods(methodslist):
+    if type(methodslist) == str: #got full methods, not methods list - so convert to methods list
+        methodslist = getmethodslist(methodslist)
+    global methods
+    methods = []
+    for thismethod in methodslist:
+        thismethoddata = {
+                  "Name" : getmethodname(thismethod),
+                  "Type" : getmethodtype(thismethod),
+                  "Content" : thismethod,
+                  "Offset" : getmethodoffset(thismethod),
+                  "Params" : getmethodparams(thismethod),
+                  "ParamTypes" : getmethodparamtypes(thismethod),
+                  }
+        methods.append(thismethoddata)
     return(methods)
+
 
 def getfullmethods(thisobject):
     thisobject = removeattributes(thisobject)
@@ -1941,6 +2036,21 @@ def getfullmethods(thisobject):
         fullmethods = ""
     return(fullmethods)
 
+def methodsmatch(method1,method2,checkparams = True):
+    type1 = method1["Type"]
+    type2 = method2["Type"]
+    typesmatch = (type1 == type2)
+    if checkparams:
+        params1 = method1["ParamTypes"]
+        params2 = method2["ParamTypes"]
+        paramsmatch = (param1 == param2)
+    else:
+        paramsmatch = True
+    return(typesmatch and paramsmatch) #is percentage score not less than tolerated percent?
+    
+checkmethods = methodsmatch #same thing, but different name
+comparemethods = methodsmatch #same thing, but different name
+
 def getobject(objectnames,fullobjects,casesensitive = False):
     if type(objectnames) == str: #convert to list
         objectnames = [objectnames]
@@ -1954,7 +2064,7 @@ def getobject(objectnames,fullobjects,casesensitive = False):
             thisobject = {
                   "Name" : getobjectname(thisfullobject),
                   "Namespace" : getobjectnamespace(thisfullobject),
-                  "ReferenceType" : getreferencetype(thisfullobject),
+                  "UserDefinedType" : getuserdefinedtype(thisfullobject),
                   "Shared" : getisshared(thisfullobject),
                   "Type" : getobjecttype(thisfullobject),
                   "Content" : thisfullobject,
@@ -1963,7 +2073,7 @@ def getobject(objectnames,fullobjects,casesensitive = False):
                   "Methods" : getfullproperties(thisfullobject),
                   "TypeModel" : buildtypemodel(thisfullobject),
                   }
-            objectsfound = listadd(thisobject,objectsfound)
+            objectsfound.append(thisobject)
     if len(objectsfound) < len(objectnames):
         dumpcsnotfounderror(objectname)
         sys.exit()
@@ -1978,7 +2088,8 @@ def getfieldtype(thisfield,replacenames = True):
     fieldtype = readbefore(thisfield,_fieldoffsetstart)
     fieldtype = fieldtype.strip()
     words = getwords(fieldtype)
-    words = listremoveindex(len(words),words)
+    if len(words) > 0:
+        del words[len(words) - 1]
     fieldtype = wordstostring(words)
     if replacenames:
         fieldtype = replacetypenames(fieldtype)
@@ -1998,28 +2109,28 @@ def getfields(fullfields):
     fields = []
     for thisline in lines:
         if (contains(_fieldoffsetstart,thisline)):
-            fields = listadd(thisline,fields)
+            fields.append(thisline)
     return(fields)
 
 def buildtypemodel(thisobject):
     #To do: method params, number of shared classes for class
     objecttype = getobjecttype(thisobject)
-    referencetype = getreferencetype(thisobject)
+    userdefinedtype = getuserdefinedtype(thisobject)
     isshared = getisshared(thisobject)
     fields = getfields(getfullfields(thisobject))
     properties = getproperties(getfullproperties(thisobject))
-    methods = getmethods(getfullmethods(thisobject))
+    methods = getmethodslist(getfullmethods(thisobject))
     fieldtypes = []
     for thisfield in fields:
-        fieldtypes = listadd(getfieldtype(thisfield,True),fieldtypes)
+        fieldtypes.append(getfieldtype(thisfield,True))
     propertytypes = []
     for thisproperty in properties:
-        propertytypes = listadd(getpropertytype(thisproperty,True),propertytypes)
+        propertytypes.append(getpropertytype(thisproperty,True))
     methodtypes = []
     for thismethod in methods:
-        methodtypes = listadd(getmethodtype(thismethod,True),methodtypes)
+        methodtypes.append(getmethodtype(thismethod,True))
     typemodel = {
-                  "ReferenceType": referencetype,
+                  "UserDefinedType": userdefinedtype,
                   "Type": objecttype,
                   "Shared": isshared,
                   "Fields": fieldtypes,
@@ -2077,7 +2188,8 @@ def getpropertytype(thisproperty,replacenames = True):
     propertytype = readbefore(thisproperty,_propertypropertiesstart)
     propertytype = propertytype.strip()
     words = getwords(propertytype)
-    words = listremoveindex(len(words),words)
+    if len(words) > 0:
+        del words[len(words) - 1]
     propertytype = wordstostring(words)
     if replacenames:
         propertytype = replacetypenames(propertytype)
@@ -2109,7 +2221,7 @@ def getproperties(fullproperties):
     properties = []
     for thisline in lines:
         if (contains(_propertypropertiesstart,thisline)):
-            properties = listadd(thisline,properties)
+            properties.append(thisline)
     return(properties)
 
 def getfullclasses(objects):
@@ -2118,38 +2230,38 @@ def getfullclasses(objects):
     i = 0
     for thisobject in objects:
         i = i + 1
-        if multipleof(i,100):
+        if multipleof(i,1000):
             print(str(i) + "/" + str(len(fullobjects)))
-        thisobjecttype = getreferencetype(thisobject)
+        thisobjecttype = getuserdefinedtype(thisobject)
         if  (thisobjecttype == "class") :
-            fullclasses = listadd(thisobject,fullclasses)
+            fullclasses.append(thisobject)
     return(fullclasses)
 
 def getfullstructs(objects):
     global fullstructs
     fullstructs = []
     for thisobject in objects:
-        if getreferencetype(thisobject) == "struct":
-            fullstructs = listadd(thisobject,fullstructs)
+        if getuserdefinedtype(thisobject) == "struct":
+            fullstructs.append(thisobject)
     return(fullstructs)
 
 def getfullenums(objects):
     global fullenums
     fullenums = []
     for thisobject in objects:
-        if getreferencetype(thisobject) == "enum":
-            fullenums = listadd(thisobject,fullenums)
+        if getuserdefinedtype(thisobject) == "enum":
+            fullenums.append(thisobject)
     return(fullenums)
 
 def getfullinterfaces(objects):
     global fullinterfaces
     fullinterfaces = []
     for thisobject in objects:
-        if getreferencetype(thisobject) == "interface":
-            fullinterfacse = listadd(thisobject,fullinterfaces)
+        if getuserdefinedtype(thisobject) == "interface":
+            fullinterfacse.append(thisobject)
     return(fullinterfaces)
 
-def getobjects(fullobjects,getshared = True,justnameandtypemodel = False,namespacefilter = None):
+def getobjects(fullobjects,getshared = True,namespacefilter = None,justnameandtypemodel = False,returntuple = True):
     if type(namespacefilter) == str:
         namespacefilter = [namespacefilter] #convert to list
     global flagremovedshared
@@ -2187,38 +2299,44 @@ def getobjects(fullobjects,getshared = True,justnameandtypemodel = False,namespa
                 thisobject = {
                   "Name" : getobjectname(thisfullobject),
                   "Namespace" : getobjectnamespace(thisfullobject),
-                  "ReferenceType" : getreferencetype(thisfullobject),
+                  "UserDefinedType" : getuserdefinedtype(thisfullobject),
                   "Shared" : getisshared(thisfullobject),
                   "Type" : getobjecttype(thisfullobject),
                   "Content" : thisfullobject,
                   "Fields" : getfullfields(thisfullobject),
                   "Properties" : getfullproperties(thisfullobject),
-                  "Methods" : getfullproperties(thisfullobject),
+                  "Methods" : getfullmethods(thisfullobject),
                   "TypeModel" : buildtypemodel(thisfullobject),
                   }
-            objects = listadd(thisobject,objects)
+            objects.append(thisobject)
     if not(getshared):
         flagremovedshared = True
-    return(objects)
+    if returntuple:
+        return(tuple(objects))
+    else:
+        return(objects)
 
 findobject = getobject #same thing, but different name
 
-def typemodelsmatch(model1,model2,dosize = True): #make sure model1 is the unobfuscated one!
+def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodparams = False): #make sure model1 is the unobfuscated one!
+    if usetolerance == None:
+        global _tolerance
+        usetolerance = _tolerance
     #To do: method params, number of shared classes for class
-    maxscore = _referencetypeweighttrue + _objecttypeweighttrue + _sharedweighttrue + (len(model1.get("Fields")) * _fieldweighttrue) +  (len(model1.get("Methods")) * _methodweighttrue) +  (len(model1.get("Properties")) * _propertyweighttrue) #calculate maximum score
+    maxscore = _userdefinedtypeweighttrue + _objecttypeweighttrue + _sharedweighttrue + (len(model1.get("Fields")) * _fieldweighttrue) +  (len(model1.get("Methods")) * _methodweighttrue) +  (len(model1.get("Properties")) * _propertyweighttrue) #calculate maximum score
     score = float(0)
-    if dosize: #we may not always want to do size, as it may not be as reliable as the others
+    #Size
+    if dosize: #we may not always want to do size
         maxscore = maxscore + 8 #start off at 8, and subtract nothing for a perfect score
-        #Size
         #Size follows a different structure than most other methods
         size1 = (len(model1.get("Fields")) +  len(model1.get("Methods"))  + len(model1.get("Properties"))) #how many methods, fields, and propeties are there?
         size2 = (len(model2.get("Fields")) +  len(model2.get("Methods"))  + len(model2.get("Properties"))) #how many methods, fields, and propeties are there?
         score = 8 - (((abs(size2 - size1) / _sizebenchmark) * _sizeweightfalse)) #depending on the difference in size, this could have a small impact, or be very bad
-    #ReferenceType
-    if model1.get("ReferenceType") == model2.get("ReferenceType"):
-        score = score + _referencetypeweighttrue
+    #userdefinedType
+    if model1.get("UserDefinedType") == model2.get("UserDefinedType"):
+        score = score + _userdefinedtypeweighttrue
     else:
-        return(False) #Reference type MUST match
+        return(False) #userdefined type MUST match
     #IsShared
     if model1.get("Shared") == model2.get("Shared"):
         score = score + _sharedweighttrue
@@ -2227,8 +2345,6 @@ def typemodelsmatch(model1,model2,dosize = True): #make sure model1 is the unobf
     #Type
     if model1.get("Type") == model2.get("Type"):
         score = score + _objecttypeweighttrue
-    #else:
-        #score = score - _objecttypeweightfalse
     #Fields
     fields1 = list(model1.get("Fields"))
     fields2 = list(model2.get("Fields"))
@@ -2242,11 +2358,9 @@ def typemodelsmatch(model1,model2,dosize = True): #make sure model1 is the unobf
     #should also exist in the obfuscated one (newer)
     templist2 = fields1
     for item in templist2:
-        if indexofitem(item,templist) != -1:
+        if listcontains(item,templist):
             score = score + _fieldweighttrue
             templist = listremoveitem(item,templist)
-        #else:
-            #score = score - _fieldweightfalse
     #Methods
     methods1 = list(model1.get("Methods"))
     methods2 = list(model2.get("Methods"))
@@ -2260,11 +2374,9 @@ def typemodelsmatch(model1,model2,dosize = True): #make sure model1 is the unobf
     #should also exist in the obfuscated one (newer)
     templist2 = methods1
     for item in templist2:
-        if indexofitem(item,templist) != -1:
+        if listcontains(item,templist):
             score = score + _methodweighttrue
             templist = listremoveitem(item,templist)
-        #else:
-            #score = score - _methodweightfalse
     #Properties
     properties1 = list(model1.get("Properties"))
     properties2 = list(model2.get("Properties"))
@@ -2281,23 +2393,23 @@ def typemodelsmatch(model1,model2,dosize = True): #make sure model1 is the unobf
         if listcontains(item,templist):
             score = score + _propertyweighttrue
             templist = listremoveitem(item,templist)
-        #else:
-            #score = score - _propertyweightfalse
     #To do: method params, number of shared classes for class
-    global matchscore #I'm too lazy to make it a return so I will just make it global xD
     matchscore = ((score / maxscore) * 100)
-    return(not(((score / maxscore) * 100) < _tolerance)) #is percentage score not less than tolerated percent?
+    return(not(((score / maxscore) * 100) < usetolerance)) #is percentage score not less than tolerated percent?
     
 comparetypemodels = typemodelsmatch  #same thing, but different name
 checktypemodels = typemodelsmatch #same thing, but different name
 
 
-def checkformatch(object1,object2,dosize = True): #make sure object1 is the unobfuscated one!
-    return(typemodelsmatch(object1.get("TypeModel"),object2.get("TypeModel"),dosize))
+def objectscheckformatch(object1,object2,usetolerance = None,dosize = True): #make sure object1 is the unobfuscated one!
+    return(typemodelsmatch(object1.get("TypeModel"),object2.get("TypeModel"),usetolerance,dosize))
+
+checkobjects = objectscheckformatch #same thing, but different name
+compareobjects = objectscheckformatch #same thing, but different name
+
     
 def bruteforcedeobfuscateobject(thisunobfuscated):
     global _tolerance
-    _tolerance = 80
     global objectmatches
     global obfuscated
     #global objectmatches
@@ -2307,18 +2419,18 @@ def bruteforcedeobfuscateobject(thisunobfuscated):
         #i = i + 1
         #if multipleof(i,100):
             #print(str(i) + "/" + str(len(fullobjects)))
-        #if checkformatch(unobfuscated,thisobject):
-            #objectmatches = listadd(thisobject,objectmatches) #match!
+        #if objectscheckformatch(unobfuscated,thisobject):
+            #objectmatches.append(thisobject) #match!
     #return(objectmatches)
     
     #while True:
             #if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
                 #break
-            #lasttolerance = listadd(_tolerance,lasttolerance)
+            #lasttolerance.append((_tolerance)
             #objectmatches = []
             #for thisobfuscated in obfuscated:
-                #if checkformatch(thisunobfuscated,thisobfuscated):
-                    #objectmatches = listadd(thisobfuscated,objectmatches) #match!
+                #if objectscheckformatch(thisunobfuscated,thisobfuscated):
+                    #objectmatches.append(thisobfuscated)
             #if len(objectmatches) > 1:
                 #_tolerance = _tolerance + 5
             #elif len(objectmatches) == 0:
@@ -2326,26 +2438,27 @@ def bruteforcedeobfuscateobject(thisunobfuscated):
             #else:
                 #break
     
-    _tolerance = 80
+    lasttolerance = [999999999,9999999998,9999999997,9999999996]
+    newtolerance = _tolerance
     while True:
             if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
                 break
-            lasttolerance = listadd(_tolerance,lasttolerance)
+            lasttolerance.append(newtolerance)
             objectmatches = []
             for thisobfuscated in obfuscated:
-                if checkformatch(thisunobfuscated,thisobfuscated):
-                    objectmatches = listadd(thisobfuscated,objectmatches) #match!
+                if objectscheckformatch(thisunobfuscated,thisobfuscated,newtolerance):
+                    objectmatches.append(thisobfuscated) #match!
             if len(objectmatches) > 1:
-                _tolerance = _tolerance + 5
+                newtolerance = newtolerance + 5
             elif len(objectmatches) == 0:
-                _tolerance = _tolerance - 5
+                newtolerance = newtolerance - 5
             else:
                 break
     matchnames = []
     matchestemp = []
     for thismatch in objectmatches:
-        matchnames = listadd(str(thismatch.get("Name")),matchnames)
-        matchestemp = listadd(thismatch,matchestemp)
+        matchnames.append(str(thismatch.get("Name")))
+        matchestemp.append(thismatch)
     #if len(matchestemp) == 1:
         #obfuscated = listremoveitem(matchestemp[0],obfuscated)
     return(matchnames)
@@ -2353,7 +2466,8 @@ def bruteforcedeobfuscateobject(thisunobfuscated):
 #       Demos / Tests
 
 def comparativedeobfuscationdemo(classestofind):
-    obfuscateddumpcs = r"C:\Users\zachy\OneDrive\Documents\Work\Projects\Pixel Gun 3D\Pixel Gun 3D 22.5.0\PG3D 22.5.0 dump.cs"
+    obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/Pixel Gun 3D/Pixel Gun 3D 22.5.3/PG3D 22.5.3 dump.cs"
+    #obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/Pixel Gun 3D/Pixel Gun 3D 22.5.0/PG3D 22.5.0 dump.cs"
     unobfuscateddumpcs = r"C:\Users\zachy\OneDrive\Documents\Work\Projects\Pixel Gun 3D\Pixel Gun 3D 16.6.1\Pixel Gun 3D 16.6.1 Dump.txt"
     global _tolerance
     dumpcspath = unobfuscateddumpcs
@@ -2382,7 +2496,7 @@ def comparativedeobfuscationdemo(classestofind):
     endspeedtest()
     print("All classes extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
     startspeedtest()
-    obfuscated = getobjects(fullclasses,True,False)
+    obfuscated = getobjects(fullclasses,False,_nonamespacename,False)
     endspeedtest()
     print("All type models extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
     #while True:
@@ -2406,58 +2520,60 @@ def comparativedeobfuscationdemo(classestofind):
 ##        while True:
 ##            if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
 ##                break
-##            lasttolerance = listadd(_tolerance,lasttolerance)
+##            lasttolerance.append(_tolerance)
 ##            objectmatches = []
 ##            for thisobfuscated in obfuscated:
-##                if checkformatch(thisunobfuscated,thisobfuscated):
-##                    objectmatches = listadd(thisobfuscated,objectmatches) #match!
+##                if objectscheckformatch(thisunobfuscated,thisobfuscated):
+##                    objectmatches.append(thisobfuscated)) #match!
 ##            if len(objectmatches) > 1:
 ##                _tolerance = _tolerance + 5
 ##            elif len(objectmatches) == 0:
 ##                _tolerance = _tolerance - 5
 ##            else:
 ##                break
-##        unobfuscatednames = listadd(str(thisunobfuscated.get("Name")),unobfuscatednames)
+##        unobfuscatednames.append(str(thisunobfuscated.get("Name")))
 ##        matchnames = []
 ##        for thismatch in objectmatches:
-##            matchnames = listadd(str(thismatch.get("Name")),matchnames)
-##        obfuscatednames = listadd(matchnames,obfuscatednames)
+##            matchnames.append(str(thismatch.get("Name")))
+##        obfuscatednames.append(matchnames)
 ##    endspeedtest()
     startspeedtest()
     global unobfuscatednames
     unobfuscatednames = []
     global obfuscatednames
     obfuscatednames = []
+    oldtolerance = _tolerance
     i = 0
     for thisunobfuscated in unobfuscated:
         i = i + 1
         if multipleof(i,20):
              print(str(i) + "/" + str(len(unobfuscated)))
         lasttolerance = [999999999,9999999998,9999999997,9999999996]
-        _tolerance = 80
+        _tolerance = oldtolerance
         while True:
             if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
                 break
-            lasttolerance = listadd(_tolerance,lasttolerance)
+            lasttolerance.append(_tolerance)
             objectmatches = []
             for thisobfuscated in obfuscated:
-                if checkformatch(thisunobfuscated,thisobfuscated):
-                    objectmatches = listadd(thisobfuscated,objectmatches) #match!
+                if objectscheckformatch(thisunobfuscated,thisobfuscated):
+                    objectmatches.append(thisobfuscated) #match!
             if len(objectmatches) > 1:
                 _tolerance = _tolerance + 5
             elif len(objectmatches) == 0:
                 _tolerance = _tolerance - 5
             else:
                 break
-        unobfuscatednames = listadd(str(thisunobfuscated.get("Name")),unobfuscatednames)
+        unobfuscatednames.append(str(thisunobfuscated.get("Name")))
         matchnames = []
         matchestemp = []
         for thismatch in objectmatches:
-            matchnames = listadd(str(thismatch.get("Name")),matchnames)
-            matchestemp = listadd(thismatch,matchestemp)
-        obfuscatednames = listadd(matchnames,obfuscatednames)
+            matchnames.append(str(thismatch.get("Name")))
+            matchestemp.append(thismatch)
+        obfuscatednames.append(matchnames)
         #if len(matchestemp) == 1:
             #obfuscated = listremoveitem(matchestemp[0],obfuscated)
+    _tolerance = oldtolerance
     endspeedtest()
     print("Class(es) deobfuscated in " + timetaken + " miliseconds.")
     global results
@@ -2473,8 +2589,8 @@ def comparativedeobfuscationdemo(classestofind):
 
 def deobfuscateallclassesdemo():
    global _tolerance
-   unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/Pixel Gun 3D/Pixel Gun 3D 16.6.1/Pixel Gun 3D 16.6.1 Dump.txt"
-   obfuscateddumpcs = r"C:\Users\zachy\OneDrive\Documents\Work\Projects\Pixel Gun 3D\Pixel Gun 3D 22.5.3\PG3D 22.5.3 dump.cs"
+   #unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 Or So Unobfuscated  dump.cs"
+   #obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us 2022.7.12 dump.cs"
    #unobfuscateddumpcs = prompt("\nEnter the path to your UNOBFUSCATED dump.cs file (without quotes):")
    #obfuscateddumpcs = prompt("Enter the path to your OBFUSCATED dump.cs file (without quotes):")
    dumpcspath = unobfuscateddumpcs
@@ -2488,7 +2604,7 @@ def deobfuscateallclassesdemo():
    endspeedtest()
    print("All classes extracted from dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
-   unobfuscated = getobjects(fullclasses,False,False)
+   unobfuscated = getobjects(fullclasses,False,_nonamespacename,False)
    endspeedtest()
    print("All type models extracted from dump.cs in " + timetaken + " miliseconds.")
    write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\unobfuscatedobjects.txt",str(unobfuscated))
@@ -2507,7 +2623,7 @@ def deobfuscateallclassesdemo():
    endspeedtest()
    print("All classes extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
-   obfuscated = getobjects(fullclasses,False,False)
+   obfuscated = getobjects(fullclasses,False,_nonamespacename,False)
    endspeedtest()
    print("All type models extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\obfuscatedobjects.txt",str(obfuscated))
@@ -2516,36 +2632,38 @@ def deobfuscateallclassesdemo():
    unobfuscatednames = []
    global obfuscatednames
    obfuscatednames = []
+   oldtolerance = _tolerance
    i = 0
    for thisunobfuscated in unobfuscated:
         i = i + 1
         if multipleof(i,20):
             print(str(i) + "/" + str(len(unobfuscated)))
         lasttolerance = [999999999,9999999998,9999999997,9999999996]
-        _tolerance = 80
+        _tolerance = oldtolerance
         while True:
             if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
                 break
-            lasttolerance = listadd(_tolerance,lasttolerance)
+            lasttolerance.append(_tolerance)
             objectmatches = []
             for thisobfuscated in obfuscated:
-                if checkformatch(thisunobfuscated,thisobfuscated):
-                    objectmatches = listadd(thisobfuscated,objectmatches) #match!
+                if objectscheckformatch(thisunobfuscated,thisobfuscated):
+                    objectmatches.append(thisobfuscated) #match!
             if len(objectmatches) > 1:
                 _tolerance = _tolerance + 5
             elif len(objectmatches) == 0:
                 _tolerance = _tolerance - 5
             else:
                 break
-        unobfuscatednames = listadd(str(thisunobfuscated.get("Name")),unobfuscatednames)
+        unobfuscatednames.append(str(thisunobfuscated.get("Name")))
         matchnames = []
         matchestemp = []
         for thismatch in objectmatches:
-            matchnames = listadd(str(thismatch.get("Name")),matchnames)
-            matchestemp = listadd(thismatch,matchestemp)
-        obfuscatednames = listadd(matchnames,obfuscatednames)
+            matchnames.append(str(thismatch.get("Name")))
+            matchestemp.append(thismatch)
+        obfuscatednames.append(matchnames)
         #if len(matchestemp) == 1:
             #obfuscated = listremoveitem(matchestemp[0],obfuscated)
+   _tolerance = oldtolerance
    endspeedtest()
    print("All class names deobfuscated in " + timetaken + " miliseconds.")
    global results
@@ -2570,11 +2688,14 @@ def deobfuscateallclasseswithrestore():
    unobfuscatednames = []
    global obfuscatednames
    obfuscatednames = []
+   oldtolerance = _tolerance
    i = 0
    for thisunobfuscated in unobfuscated:
         i = i + 1
         if multipleof(i,20):
             print(str(i) + "/" + str(len(unobfuscated)))
+        if multipleof(i,50):
+            break
         lasttolerance = [999999999,9999999998,9999999997,9999999996]
         _tolerance = 80
         oldtime = getrawtime()
@@ -2583,11 +2704,11 @@ def deobfuscateallclasseswithrestore():
                 break #it's taking over 10 seconds each time we deobfuscate with new tolerance. that's too long. for optimization purposes, let's give up
             if ((listitem(len(lasttolerance),lasttolerance) == listitem(len(lasttolerance) - 2,lasttolerance)) and (listitem(len(lasttolerance) - 1,lasttolerance) == listitem(len(lasttolerance) - 3,lasttolerance))): #stuck in loop, trying to get to exactly 1 but can't
                 break
-            lasttolerance = listadd(_tolerance,lasttolerance)
+            lasttolerance.append(_tolerance)
             objectmatches = []
             for thisobfuscated in obfuscated:
-                if checkformatch(thisunobfuscated,thisobfuscated):
-                    objectmatches = listadd(thisobfuscated,objectmatches) #match!
+                if objectscheckformatch(thisunobfuscated,thisobfuscated):
+                    objectmatches.append(thisobfuscated) #match!
             if len(objectmatches) > 1:
                 _tolerance = _tolerance + 5
             elif len(objectmatches) == 0:
@@ -2596,15 +2717,16 @@ def deobfuscateallclasseswithrestore():
             else:
                 break
             oldtime = getrawtime()
-        unobfuscatednames = listadd(str(thisunobfuscated.get("Name")),unobfuscatednames)
+        unobfuscatednames.append(str(thisunobfuscated.get("Name")))
         matchnames = []
         matchestemp = []
         for thismatch in objectmatches:
-            matchnames = listadd(str(thismatch.get("Name")),matchnames)
-            matchestemp = listadd(thismatch,matchestemp)
-        obfuscatednames = listadd(matchnames,obfuscatednames)
+            matchnames.append(str(thismatch.get("Name")))
+            matchestemp.append(thismatch)
+        obfuscatednames.append(matchnames)
         #if len(matchestemp) == 1:
             #obfuscated = listremoveitem(matchestemp[0],obfuscated)
+   _tolerance = oldtolerance
    endspeedtest()
    print("All class names deobfuscated in " + timetaken + " miliseconds.")
    global results
@@ -2630,18 +2752,46 @@ def builddeobfuscationoutput():
        output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
    return(output)
 
-#print("Note: The program may have errors, get stuck in infinite loops, or not work correctly. This is just a demo.\nAnd of course, this may not always be accurate. It is unfinished, and even if it was finished, no deobfuscator can be perfect.\nThis will take around 20-200 minutes,\
+
+def test():
+   deobfuscateallclasseswithrestore()
+
+def test2():
+   deobfuscateallclasseswithrestore()
+
+def timetest(times = 100):
+    averagetime = []
+    for i in range(times):
+        speedtest.start()
+        test()
+        speedtest.end()
+        averagetime.append(speedtest.timetaken(False))
+    averagetime = mean(averagetime)
+    print("Test 1: " + str(averagetime) + " miliseconds")
+    averagetime = []
+    for i in range(times):
+        speedtest.start()
+        test2()
+        speedtest.end()
+        averagetime.append(speedtest.timetaken(False))
+    averagetime = mean(averagetime)
+    print("Test 2: " + str(averagetime) + " miliseconds")
+    sys.exit()
+
+print("Note: The program may have errors, get stuck in infinite loops, or not work correctly. This is just a demo.\nAnd of course, this may not always be accurate. It is unfinished, and even if it was finished, no deobfuscator can be perfect.\nThis will take around 20-200 minutes,\
 depending on your device. Be patient - it is worth the wait!")
 init()
 #a = "// Namespace: \ninternal static class 一丐世丟丒丞丄与世 // TypeDefIndex: 13480\n{\n	// Fields\n	private static float 丘与丆且丁专丅丁丛; // 0x0\n	[CompilerGeneratedAttribute] // RVA: 0x1D85380 Offset: 0x1D85380 VA: 0x1D85380\n	private static Dictionary<string, float> <世丝丒丂丝与一丐不>k__BackingField; // 0x8\n	private static bool 世丝丄丑丁丆丄三业; // 0x10\n\n	// Properties\n	internal static Dictionary<string, float> 丞丂业丅丐三丁七丞 { get; set; }\n	private static bool 业丁丈丑丟丝丘丟世 { get; }\n	internal static string 丝丟三丌丁七三不丈 { get; }\n	internal static string 丗丑丞七万业丏丈丞 { get; }\n	internal static string 丌上丌丆上与丘丘丘 { get; }\n	internal static string 丟丟丛世不万且万丙 { get; }\n	internal static string 丁且丈丌丁丁丙丏与 { get; }\n	internal static bool 七不丝三世丑丂不丐 { get; set; }\n	internal static float 丟上丆丕丛丕专丗与 { get; set; }\n	internal static float 万丌不丈丂丈东丂丄 { get; }\n	internal static bool 丈万七与丙与下丆丁 { get; }\n	internal static bool 一丅丞丘专丌丒业丌 { get; }\n	internal static float 丏丙丝丆丄下丐不丗 { get; }\n	internal static float 丛丌世丆丁业且丈丈 { get; }\n	internal static float 丄丘丂丗丘丈与丘丞 { get; }\n	internal static float 与下万且丑丁东三与 { get; }\n	internal static float 丗丕与丆丘不丂万专 { get; }\n	internal static bool 丄下丛丌不丁业七丟 { get; }\n	internal static float 三且丂丏丄业丐与丏 { get; }\n	internal static float 丈七丟丈一与一一丑 { get; }\n	internal static bool 丅丂下丈一不丌丑丒 { get; }\n	internal static bool 丐丕丑丐专上丂丅丅 { get; }\n	internal static bool 丝万万七七丕不丒东 { get; }\n	internal static bool 一丐丅丈丈丕丆业世 { get; }\n	internal static bool 丑丑丆丂万万丆丕丂 { get; }\n	internal static bool 万丝丈专三丌业丏丞 { get; }\n	internal static bool 不且下丐丈丂七丗业 { get; }\n	internal static bool 世万丗上世丅丁三丕 { get; }\n	internal static bool 丛丞丒一上丂丘丌三 { get; }\n	internal static bool 丗与丂丗丆丈丌万万 { get; }\n	internal static bool 丞东专东一丆丌丁丟 { get; }\n	internal static bool 丙丕一丈一丐丐丏三 { get; }\n	internal static bool 丂丙丅与丑丙且丁丞 { get; }\n	internal static bool 丛丌丄下业丒丂丝丂 { get; }\n	private static bool 与东丒不丅丙万丘丂 { get; }\n\n	// Methods\n\n	// RVA: 0x4095680 Offset: 0x4095680 VA: 0x4095680\n	private static void .cctor() { }\n\n	[CompilerGeneratedAttribute] // RVA: 0x1DF9AC4 Offset: 0x1DF9AC4 VA: 0x1DF9AC4\n	// RVA: 0x4095A90 Offset: 0x4095A90 VA: 0x4095A90\n	internal static Dictionary<string, float> 业世丞丙丆万丙东丛() { }\n\n	[CompilerGeneratedAttribute] // RVA: 0x1DF9AD4 Offset: 0x1DF9AD4 VA: 0x1DF9AD4\n	// RVA: 0x4095A24 Offset: 0x4095A24 VA: 0x4095A24\n	private static void 丟下业三下万万下下(Dictionary<string, float> 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x4095AF8 Offset: 0x4095AF8 VA: 0x4095AF8\n	private static bool 丁丂丞丁丗业丐一丄() { }\n\n	// RVA: 0x4095C54 Offset: 0x4095C54 VA: 0x4095C54\n	internal static string 上与丏丁世丈丝丐丟() { }\n\n	// RVA: 0x4095D48 Offset: 0x4095D48 VA: 0x4095D48\n	internal static string 丌万丕世丒丑丛东世() { }\n\n	// RVA: 0x4095E3C Offset: 0x4095E3C VA: 0x4095E3C\n	internal static string 上丏下丄世上专丙丆() { }\n\n	// RVA: 0x4095F30 Offset: 0x4095F30 VA: 0x4095F30\n	internal static string 丝七上丅且丅三一丏() { }\n\n	// RVA: 0x4096024 Offset: 0x4096024 VA: 0x4096024\n	internal static string 东且丑专丁且丈丈丝() { }\n\n	// RVA: 0x40960C4 Offset: 0x40960C4 VA: 0x40960C4\n	internal static bool 上丗丗与丗丝丑丏丆() { }\n\n	// RVA: 0x409612C Offset: 0x409612C VA: 0x409612C\n	internal static void 不丕三丅丈丅丛七丝(bool 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x409619C Offset: 0x409619C VA: 0x409619C\n	internal static float 丞一上丕丕丅丞丙丅() { }\n\n	// RVA: 0x4096204 Offset: 0x4096204 VA: 0x4096204\n	internal static void 且丁下丙丝七丂世丗(float 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x4096324 Offset: 0x4096324 VA: 0x4096324\n	internal static float 丆丞丘丟丞丛专三丈() { }\n\n	// RVA: 0x4096EF4 Offset: 0x4096EF4 VA: 0x4096EF4\n	internal static bool 专丝不丝丗世丞丕丂() { }\n\n	// RVA: 0x4096F74 Offset: 0x4096F74 VA: 0x4096F74\n	internal static bool 世丟且万丐丆与丏丘() { }\n\n	// RVA: 0x409775C Offset: 0x409775C VA: 0x409775C\n	internal static float 丄丂丄丙丑丈丞丌一() { }\n\n	// RVA: 0x4097B10 Offset: 0x4097B10 VA: 0x4097B10\n	internal static float 丅丝丄丏丕丝与丐下() { }\n\n	// RVA: 0x4097D04 Offset: 0x4097D04 VA: 0x4097D04\n	internal static float 丏丝丛丏万丙业丌丈() { }\n\n	// RVA: 0x4097D8C Offset: 0x4097D8C VA: 0x4097D8C\n	internal static float 万丛丐东丂丅丑业三() { }\n\n	// RVA: 0x4097F8C Offset: 0x4097F8C VA: 0x4097F8C\n	internal static float 上丐丆业丆丐与丝丗() { }\n\n	// RVA: 0x40984B8 Offset: 0x40984B8 VA: 0x40984B8\n	internal static bool 世丕丘丄世丆世丏世() { }\n\n	// RVA: 0x409875C Offset: 0x409875C VA: 0x409875C\n	internal static float 丌丛丙不丟丅一丆丛() { }\n\n	// RVA: 0x4098E64 Offset: 0x4098E64 VA: 0x4098E64\n	internal static float 丒丆专丑丗丆与丗丞() { }\n\n	// RVA: 0x40998D4 Offset: 0x40998D4 VA: 0x40998D4\n	internal static bool 丕业丄丞丆丛专且丑() { }\n\n	// RVA: 0x409993C Offset: 0x409993C VA: 0x409993C\n	internal static bool 丌丌且丙丗丈丄业丒() { }\n\n	// RVA: 0x40999A4 Offset: 0x40999A4 VA: 0x40999A4\n	internal static float 丟丄丙丒丗丂丗与七(int 丌丂丅丑丗且丌丞丑) { }\n\n	// RVA: 0x4099E48 Offset: 0x4099E48 VA: 0x4099E48\n	internal static float 业丕丟丑丏上丌一万(int 丞丕不不丘丗丟丄丈) { }\n\n	// RVA: 0x409A67C Offset: 0x409A67C VA: 0x409A67C\n	internal static float 丈专丙丅丕丌丄专下(int 丌丂丅丑丗且丌丞丑) { }\n\n	// RVA: 0x409A760 Offset: 0x409A760 VA: 0x409A760\n	internal static float 丙丐丅上七丒与丑业() { }\n\n	// RVA: 0x409A7F4 Offset: 0x409A7F4 VA: 0x409A7F4\n	internal static float 丝东下下丂丞上丕丟() { }\n\n	// RVA: 0x409A888 Offset: 0x409A888 VA: 0x409A888\n	internal static float 下丕丅下世且一东七() { }\n\n	// RVA: 0x409A91C Offset: 0x409A91C VA: 0x409A91C\n	internal static float 丁一不一万下丗丗世(int 丂丏丄且丂专业万丟) { }\n\n	// RVA: 0x409C4A4 Offset: 0x409C4A4 VA: 0x409C4A4\n	internal static float 丌丐专下丘一丑不丞(int 丂丏丄且丂专业万丟) { }\n\n	// RVA: 0x409C53C Offset: 0x409C53C VA: 0x409C53C\n	internal static float 一丆丘与业东丅与丟(string 丗下丏三东七丞专东) { }\n\n	// RVA: 0x409C9B0 Offset: 0x409C9B0 VA: 0x409C9B0\n	internal static float 与万丌专一一不丌丘(WeaponSounds 丅丏丆丆且丒世上丁, string 丗丑丞七万业丏丈丞, string 丌上丌丆上与丘丘丘, string 丟丟丛世不万且万丙) { }\n\n	// RVA: 0x409CF00 Offset: 0x409CF00 VA: 0x409CF00\n	internal static float 丐丘丗丞专丒一丟丝(int 丞下丛丆万与且丘丒) { }\n\n	// RVA: 0x409D6EC Offset: 0x409D6EC VA: 0x409D6EC\n	internal static float 丙东丟丁东丘丆七丞(int 不丏丞丗丞三丅丄丝, string 丗丑丞七万业丏丈丞, string 丌上丌丆上与丘丘丘, string 丟丟丛世不万且万丙) { }\n\n	// RVA: 0x409DBBC Offset: 0x409DBBC VA: 0x409DBBC\n	internal static float 丙业下丄丕且丝丙三() { }\n\n	// RVA: 0x409DC2C Offset: 0x409DC2C VA: 0x409DC2C\n	internal static float 世丈丂丑丝丘丂丛专() { }\n\n	// RVA: 0x409DC9C Offset: 0x409DC9C VA: 0x409DC9C\n	internal static float 下丙万丆丗丝专丙丝() { }\n\n	// RVA: 0x409DD0C Offset: 0x409DD0C VA: 0x409DD0C\n	internal static float 丈上丁丏丂丁东专丄() { }\n\n	// RVA: 0x409E074 Offset: 0x409E074 VA: 0x409E074\n	internal static float 丙丄专七丌丛丙丏三() { }\n\n	// RVA: 0x409E168 Offset: 0x409E168 VA: 0x409E168\n	internal static bool 专一丄丛丏丗下丄三() { }\n\n	// RVA: 0x409E250 Offset: 0x409E250 VA: 0x409E250\n	internal static bool 丑上丒且一丕三业一() { }\n\n	// RVA: 0x409E338 Offset: 0x409E338 VA: 0x409E338\n	internal static bool 丘丗丆丗不丘丐上且() { }\n\n	// RVA: 0x409E420 Offset: 0x409E420 VA: 0x409E420\n	internal static bool 丆丐世丕万专丑丌丑() { }\n\n	// RVA: 0x409E508 Offset: 0x409E508 VA: 0x409E508\n	internal static bool 丞丞丒东东万丞丞丙() { }\n\n	// RVA: 0x409E5F0 Offset: 0x409E5F0 VA: 0x409E5F0\n	internal static bool 丁世丝丝一一世丘丐() { }\n\n	// RVA: 0x409E698 Offset: 0x409E698 VA: 0x409E698\n	internal static bool 丏丙东不七丑丒且丄() { }\n\n	// RVA: 0x409E740 Offset: 0x409E740 VA: 0x409E740\n	internal static bool 丈丙丅丄三丘且丈丆() { }\n\n	// RVA: 0x409E7E8 Offset: 0x409E7E8 VA: 0x409E7E8\n	internal static bool 且丄东专业与万丈万() { }\n\n	// RVA: 0x409E890 Offset: 0x409E890 VA: 0x409E890\n	internal static bool 丒丟一一丄丈丁与丑() { }\n\n	// RVA: 0x409E938 Offset: 0x409E938 VA: 0x409E938\n	internal static bool 丝丆万丝丂丌丛下丞() { }\n\n	// RVA: 0x409E9E0 Offset: 0x409E9E0 VA: 0x409E9E0\n	internal static bool 丆丙丄不业丝七万七() { }\n\n	// RVA: 0x4096E2C Offset: 0x4096E2C VA: 0x4096E2C\n	private static bool 一丟丞丆丗专专且丄() { }\n}"#deobfuscateallclassesdemo()
-#offsets = []
-#for i in getmethods(getfullmethods(a)):
-    #if getmethodtype(i) == "internal static float":
-        #offsets = listadd(getmethodoffset(i),offsets)
-#print(offsetstohex(offsets,r"C:/Users/zachy/OneDrive/Documents/Work/Projects/Pixel Gun 3D/Pixel Gun 3D 22.5.0/libil2cpp.so"))
-#deobfuscateallclassesdemo()
-#comparativedeobfuscationdemo(["GlobalGameController","EffectsController","WeaponW"])
+#unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 Or So Unobfuscated  dump.cs"
+#obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us 2022.7.12 dump.cs"
+#unobfuscateddumpcs = prompt("\nEnter the path to your UNOBFUSCATED dump.cs file (without quotes):")
+#obfuscateddumpcs = prompt("Enter the path to your OBFUSCATED dump.cs file (without quotes):")
+#dumpcspath = unobfuscateddumpcs
+#loaddumpcs(dumpcspath)
+#sys.exit()
+deobfuscateallclassesdemo()
+#comparativedeobfuscationdemo(["Rocket"])
 #write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Outputs\output.txt",output)
-#write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\output2.txt",output)
-#print("Done deobfuscating! Check your output folder!")
-#print(output)
+write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\output2.txt",output)
+print("Done deobfuscating! Check your output folder!")
+print(output)

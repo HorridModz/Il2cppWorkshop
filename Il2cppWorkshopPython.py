@@ -466,7 +466,7 @@ def init():
             _attributestart = "["
             global _attributeend
             _attributeend = "]"
-            #Deobfuscation by comparison constants
+            #Deobfuscation constants
             global _tolerance
             _tolerance = float(80) #By default, objects are preferred to have a similarity score of at least 80% to be considered a match (but this can be modified or adjusted)
             global _userdefinedtypeweightfalse
@@ -507,6 +507,8 @@ def init():
             _sizeweighttrue = float(2)
             global _sizebenchmark
             _sizebenchmark = float(4)
+            global _trustnames #if two names are the same, deobfuscation will assume they are the same thing with this setting. however, some games purposely scramble names to confuse people and tools like this.
+            _trustnames = True
     #init cloud stuff
         def inithttp():
             #userdefinedd from https://flaviocopes.com/python-http-server/
@@ -566,6 +568,8 @@ def initflags():
             flagremovedattributes = False
             global flagremovedshared
             flagremovedshared = False
+            global flagremovedblanklines
+            flagremovedblanklines = True
 
 resetflags = initflags #same thing, but different name
 
@@ -1748,6 +1752,8 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
             else:
                 newitem = removeblanklines(thisitem)
             new.append(newitem)
+        global flagremovedblanklines
+        flagremovedblanklines = True
         fullobjects = new
     new = []
     for thisitem in fullobjects: #Add seperator back on, as string.split excludes the seperator
@@ -1780,7 +1786,7 @@ def getfullobjects(dumpcs,getshared = True,toremoveattributes = True,toremovebla
         fullobjects = new
         #fullobjects = [thisitem for thisitem in fullobjects if not(getisshared(thisitem))]
         global flagremovedshared
-        flagremovedshared = False
+        flagremovedshared = True
     if returntuple:
         return(tuple(fullobjects))
     else:
@@ -2411,7 +2417,7 @@ def getfullinterfaces(objects):
 def getobjects(fullobjects,getshared = True,namespacefilter = None,justnameandtypemodel = False,returntuple = True):
     if type(namespacefilter) == str:
         namespacefilter = [namespacefilter] #convert to list
-    if namespacefilter == []:
+    if namespacefilter == [] or namespacefilter is False:
         namespacefilter = None
     global flagremovedshared
     #if localfullobjects == None:
@@ -2537,14 +2543,21 @@ def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodpara
                     templist.remove(item)
     #To do: method params, number of shared classes for class
     matchscore = ((score / maxscore) * 100)
+    endspeedtest()
     return(not(((score / maxscore) * 100) < usetolerance)) #is percentage score not less than tolerated percent?
     
 comparetypemodels = typemodelsmatch  #same thing, but different name
 checktypemodels = typemodelsmatch #same thing, but different name
 
-
 def objectscheckformatch(object1,object2,usetolerance = None,dosize = True,domethodparams = True,dopropertyattributes = True): #make sure object1 is the unobfuscated one!
-    return(typemodelsmatch(object1.get("TypeModel"),object2.get("TypeModel"),usetolerance,dosize,domethodparams,dopropertyattributes))
+    global _trustnames
+    if _trustnames:
+        if str(object1.get("Name")) == str(object2.get("Name")):
+            return(True)
+        else:
+            return(typemodelsmatch(object1.get("TypeModel"),object2.get("TypeModel"),usetolerance,dosize,domethodparams,dopropertyattributes))
+    else:
+        return(typemodelsmatch(object1.get("TypeModel"),object2.get("TypeModel"),usetolerance,dosize,domethodparams,dopropertyattributes))
 
 checkobjects = objectscheckformatch #same thing, but different name
 compareobjects = objectscheckformatch #same thing, but different name
@@ -2612,7 +2625,7 @@ def comparativedeobfuscationdemo(classestofind):
     endspeedtest()
     print("All classes extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
     startspeedtest()
-    obfuscated = getobjects(fullclasses,False,_nonamespacename,False)
+    obfuscated = getobjects(fullclasses,True)
     endspeedtest()
     print("All type models extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
     #while True:
@@ -2680,6 +2693,8 @@ def comparativedeobfuscationdemo(classestofind):
                 _tolerance = _tolerance - 5
             else:
                 break
+            if ((_tolerance < 0) or (_tolerance > 100)):
+                break
         unobfuscatednames.append(str(thisunobfuscated.get("Name")))
         matchnames = []
         matchestemp = []
@@ -2710,7 +2725,7 @@ def deobfuscateallclassesdemo():
    dumpcspath = unobfuscateddumpcs
    loaddumpcs(dumpcspath)
    startspeedtest()
-   getfullobjects(dumpcs,True)
+   getfullobjects(dumpcs,False)
    endspeedtest()
    print("All classes/structs/interfaces/enums extracted from dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
@@ -2718,7 +2733,7 @@ def deobfuscateallclassesdemo():
    endspeedtest()
    print("All classes extracted from dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
-   unobfuscated = getobjects(fullclasses,True,_nonamespacename,False)
+   unobfuscated = getobjects(fullclasses,False)
    endspeedtest()
    print("All type models extracted from dump.cs in " + timetaken + " miliseconds.")
    write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\unobfuscatedobjects.txt",str(unobfuscated))
@@ -2726,10 +2741,12 @@ def deobfuscateallclassesdemo():
    flagremovedshared = False
    global flagremovedattributes
    flagremovedattributes = False
+   global flagremovedblanklines
+   flagremovedblanklines = False
    dumpcspath = obfuscateddumpcs
    loaddumpcs(dumpcspath)
    startspeedtest()
-   getfullobjects(dumpcs,True)
+   getfullobjects(dumpcs,False)
    endspeedtest()
    print("All classes/structs/interfaces/enums extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
@@ -2737,7 +2754,7 @@ def deobfuscateallclassesdemo():
    endspeedtest()
    print("All classes extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
-   obfuscated = getobjects(fullclasses,True,_nonamespacename,False)
+   obfuscated = getobjects(fullclasses,False)
    endspeedtest()
    print("All type models extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\obfuscatedobjects.txt",str(obfuscated))
@@ -2767,6 +2784,8 @@ def deobfuscateallclassesdemo():
             elif len(objectmatches) == 0:
                 _tolerance = _tolerance - 5
             else:
+                break
+            if ((_tolerance < 0) or (_tolerance > 100)):
                 break
         unobfuscatednames.append(str(thisunobfuscated.get("Name")))
         matchnames = []
@@ -2818,6 +2837,8 @@ def deobfuscateallclasseswithrestore():
             elif len(objectmatches) == 0:
                 _tolerance = _tolerance - 5
             else:
+                break
+            if ((_tolerance < 0) or (_tolerance > 100)):
                 break
         unobfuscatednames.append(str(thisunobfuscated.get("Name")))
         matchnames = []
@@ -2901,6 +2922,6 @@ init()
 deobfuscateallclassesdemo()
 #comparativedeobfuscationdemo(["Rocket"])
 #write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Outputs\output.txt",output)
-write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\output2.txt",output)
+write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\output.txt",output)
 print("Done deobfuscating! Check your output folder!")
 print(output)

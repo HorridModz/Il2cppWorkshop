@@ -441,12 +441,12 @@ def init():
             _processdatatypegroups = True #more accurate, but slower
             global _fieldoffsetstart
             _fieldoffsetstart = "; // 0x"
-            global _propertypropertiesstart
-            _propertypropertiesstart = " { "
-            global _propertypropertiesend
-            _propertypropertiesend = "; }"
-            global _propertypropertieseparator
-            _propertypropertieseparator = "; "
+            global _propertyattributesstart
+            _propertyattributesstart = " { "
+            global _propertyattributesend
+            _propertyattributesend = "; }"
+            global _propertyattributeseparator
+            _propertyattributeseparator = "; "
             global _methodoffsetline
             _methodoffsetline = 1
             global _methodtypeline
@@ -1958,7 +1958,7 @@ def getproperty(propertyname,propertieslist,casesensitive = False):
                   "Name" : getpropertyname(thisproperty),
                   "Type" : getpropertytype(thisproperty),
                   "Content" : thisproperty,
-                  "Propeties" : getpropertyproperties(thisproperty),
+                  "Propeties" : getpropertyattributes(thisproperty),
                   }
             return(thisproperty)
     dumpcsnotfounderror(propertyname)
@@ -2236,7 +2236,14 @@ def buildtypemodel(thisobject):
         fieldtypes.append(getfieldtype(thisfield,True))
     propertytypes = []
     for thisproperty in properties:
-        propertytypes.append(getpropertytype(thisproperty,True))
+        thispropertymodel = {
+                            "Type": getpropertytype(thisproperty,True),
+                            "Attributes": getpropertyattributes(thisproperty),
+                            }
+        propertytypes.append(thispropertymodel)
+    justpropertytypes = []
+    for thisproperty in properties:
+        justpropertytypes.append(getpropertytype(thisproperty,True))
     methodtypes = []
     for thismethod in methods:
         thismethodmodel = {
@@ -2253,12 +2260,14 @@ def buildtypemodel(thisobject):
                   "Shared": isshared,
                   "Fields": fieldtypes,
                   "Properties": propertytypes,
+                  "PropertyTypes": justpropertytypes,
                   "Methods": methodtypes,
                   "MethodTypes": justmethodtypes,
                   }
     return(typemodel)
     
 gettypemodel = buildtypemodel #same thing, but different name
+maketypemodel = buildtypemodel #same thing, but different name
 
 def getfullfields(thisobject):
     global fullfields
@@ -2307,8 +2316,8 @@ def getfullproperties(thisobject):
     return(fullproperties)
 
 def getpropertytype(thisproperty,replacenames = True):
-    thisproperty = substring(thisproperty,0,findstr(_propertypropertiesstart,thisproperty))
-    propertytype = readbefore(thisproperty,_propertypropertiesstart)
+    thisproperty = substring(thisproperty,0,findstr(_propertyattributesstart,thisproperty))
+    propertytype = readbefore(thisproperty,_propertyattributesstart)
     propertytype = propertytype.strip()
     words = getwords(propertytype)
     if len(words) > 0:
@@ -2318,21 +2327,21 @@ def getpropertytype(thisproperty,replacenames = True):
         propertytype = replacetypenames(propertytype)
     return(propertytype)
 
-def getfullpropertyproperties(thisproperty):
-    fullproperties = readbetween(thisproperty,_propertypropertiesstart,_propertypropertiesend)
+def getfullpropertyattributes(thisproperty):
+    fullproperties = readbetween(thisproperty,_propertyattributesstart,_propertyattributesend)
     fullproperties = fullproperties.strip()
     words = getwords(fullproperties)
     fullproperties = wordstostring(words)
     return(fullproperties)
 
-def getpropertyproperties(thisproperty):
-    fullproperties = getfullpropertyproperties(thisproperty)
-    properties = fullproperties.split(_propertypropertieseparator)
+def getpropertyattributes(thisproperty):
+    fullproperties = getfullpropertyattributes(thisproperty)
+    properties = fullproperties.split(_propertyattributeseparator)
     return(properties)
     
 def getpropertyname(thisproperty):
-    thisproperty = substring(thisproperty,0,findstr(_propertypropertiesstart,thisproperty))
-    propertyname = readbefore(thisproperty,_propertypropertiesstart)
+    thisproperty = substring(thisproperty,0,findstr(_propertyattributesstart,thisproperty))
+    propertyname = readbefore(thisproperty,_propertyattributesstart)
     propertyname = propertyname.strip()
     words = getwords(propertyname)
     propertyname = lines[len(words) - 1]
@@ -2343,7 +2352,7 @@ def getpropertieslist(fullproperties):
     lines = getlines(fullproperties,True,True)
     properties = []
     for thisline in lines:
-        if (contains(_propertypropertiesstart,thisline)):
+        if (contains(_propertyattributesstart,thisline)):
             properties.append(thisline)
     return(properties)
 
@@ -2357,8 +2366,8 @@ def getproperties(propertieslist):
                   "Name" : getpropertyname(thisproperty),
                   "Type" : getpropertytype(thisproperty),
                   "Content" : thisproperty,
-                  "Properties" : getpropertyproperties(thisproperty),
-				  "FullProperties" : getfullpropertyproperties(thisproperty),
+                  "Properties" : getpropertyattributes(thisproperty),
+		  "FullProperties" : getfullpropertyattributes(thisproperty),
                   }
         properties.append(thispropertydata)
     return(properties)
@@ -2458,7 +2467,7 @@ def getobjects(fullobjects,getshared = True,namespacefilter = None,justnameandty
 
 findobject = getobject #same thing, but different name
 
-def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodparams = True): #make sure model1 is the unobfuscated one!
+def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodparams = True,dopropertyattributes = True): #make sure model1 is the unobfuscated one!
     if usetolerance == None:
         global _tolerance
         usetolerance = _tolerance
@@ -2466,7 +2475,7 @@ def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodpara
     maxscore = _userdefinedtypeweighttrue + _objecttypeweighttrue + _sharedweighttrue + (len(model1.get("Fields")) * _fieldweighttrue) +  (len(model1.get("Methods")) * _methodweighttrue) +  (len(model1.get("Properties")) * _propertyweighttrue) #calculate maximum score
     score = float(0)
     #Size
-    if dosize: #we may not always want to do size
+    if dosize:
         maxscore = maxscore + 8 #start off at 8, and subtract nothing for a perfect score
         #Size follows a different structure than most other methods
         size1 = (len(model1.get("Fields")) +  len(model1.get("Methods"))  + len(model1.get("Properties"))) #how many methods, fields, and propeties are there?
@@ -2511,17 +2520,21 @@ def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodpara
                 if (item in templist):
                     score = score + _methodweighttrue
                     templist.remove(item)
-    #Properties
-    properties1 = list(model1.get("Properties"))
-    properties2 = list(model2.get("Properties"))
+   #Properties
+    if dopropertyattributes:
+        properties1 = list(model1.get("Properties"))
+        properties2 = list(model2.get("Properties"))
+    else:
+        properties1 = list(model1.get("PropertyTypes"))
+        properties2 = list(model2.get("PropertyTypes"))
     templist = list(properties2) #it's very normal to add on things, but not as common to delete them. So, most of the properties in the unobfuscated (earlier) one
     #should also exist in the obfuscated one (newer)
     templist2 = list(properties1)
     for item in templist2:
-        if len(templist) > 0:
-            if (item in templist):
-                score = score + _propertyweighttrue
-                templist.remove(item)
+            if len(templist) > 0:
+                if (item in templist):
+                    score = score + _propertyweighttrue
+                    templist.remove(item)
     #To do: method params, number of shared classes for class
     matchscore = ((score / maxscore) * 100)
     return(not(((score / maxscore) * 100) < usetolerance)) #is percentage score not less than tolerated percent?
@@ -2530,11 +2543,12 @@ comparetypemodels = typemodelsmatch  #same thing, but different name
 checktypemodels = typemodelsmatch #same thing, but different name
 
 
-def objectscheckformatch(object1,object2,usetolerance = None,dosize = True,domethodparams = True): #make sure object1 is the unobfuscated one!
-    return(typemodelsmatch(object1.get("TypeModel"),object2.get("TypeModel"),usetolerance,dosize,domethodparams))
+def objectscheckformatch(object1,object2,usetolerance = None,dosize = True,domethodparams = True,dopropertyattributes = True): #make sure object1 is the unobfuscated one!
+    return(typemodelsmatch(object1.get("TypeModel"),object2.get("TypeModel"),usetolerance,dosize,domethodparams,dopropertyattributes))
 
 checkobjects = objectscheckformatch #same thing, but different name
 compareobjects = objectscheckformatch #same thing, but different name
+objectsmatch = objectscheckformatch #same thing, but different name
 
     
 def bruteforcedeobfuscateobject(thisunobfuscated):

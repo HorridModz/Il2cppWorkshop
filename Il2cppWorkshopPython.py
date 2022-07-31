@@ -363,7 +363,7 @@ def init():
                 #Remove duplicates
                 newtypes = [] #the for loop will change when we update valuetypes, so we have to make a new array, and set valuetypes to this new array when we are done using it
                 for thistype in _types: #use the new value types that already have suffixes, but not prefixes
-                    if not(listcontains(thistype,newtypes)):
+                    if not(thistype in newtypes):
                         newtypes.append(thistype)
                 _types = newtypes #set valuetypes to the newtypes now that we are done iterating through it
 
@@ -1052,7 +1052,7 @@ def listreplaceall(thislist,item,new):
     if found:
         listremoveindex(i,thislist)
         '''
-    for i in enumerate(thislist):
+    for i in range(len(thislist)):
         thisitem = thislist[i]
         if thisitem == item: #type is considered
             thislist[i] = new
@@ -1079,7 +1079,7 @@ def indexofitem(item,thislist):
     except:
         return(-1)
 
-def byname(itemname,namelist,wantedlist):
+def listitembyname(itemname,namelist,wantedlist):
     return wantedlist[indexofitem(itemname,namelist) - 1]
 
 def listadd(item,thislist):
@@ -1129,7 +1129,7 @@ def stringtodict(thisstring):
 #  Variable functions
 
 def variableexists(varname):
-    return(listcontains(varname,globals()))
+    return(varname in globals())
 
 def globalvars():
     return(globals())
@@ -1244,7 +1244,7 @@ def fileexists(path,giveerror = False):
 
 def openfile(path,opentype,encoding = "utf8"):
     exceptions = ["w","a"] #some modes create a new file if it does not exist, so we do not need to return None if it does not exist
-    if (not(fileexists(path,False)) and (not(listcontains(opentype,exceptions)))):
+    if (not(fileexists(path,False)) and (not(opentype in exceptions))):
                filenotfounderror(path)
                return None
     file = None
@@ -1411,12 +1411,12 @@ class settingsmanager():
 
 def warning(message,actions= ["log","print"]):
     #log, print, printlog, printcurrentsublog, terminate, stop current function, etc.
-    if listcontains("log",actions):
+    if ("log" in actions):
         log(warning,message)
 
 def error(message,actions = ["log","print"]):
 #log, print, printlog, printcurrentsublog, terminate, stop current function, etc.
-    if listcontains("log",actions):
+    if ("log" in actions):
         log(error,message)
         
 def log(logtype,message,time = True,date = False):
@@ -1698,7 +1698,7 @@ def getnamespaces(fullobjects):
         if multipleof(i,1000):
             print(str(i) + "/" + str(len(fullobjects)))
         thisnamespacename = getobjectnamespace(thisobject)
-        if listcontains(thisnamespacename,namespacenames):
+        if thisnamespacename in namespacenames:
            thisnamespacecontent = namespacecontent[indexofitem(thisnamespacename,namespacenames) - 1]
            thisnamespacecontent.append(thisobject)
            namespacecontent = listreplaceall(namespacecontent,indexofitem(thisnamespacename,namespacenames),thisnamespacecontent)
@@ -1707,7 +1707,7 @@ def getnamespaces(fullobjects):
             namespacenames.append(thisnamespacename)
             namespacecontent.append(thisnamespacecontent)
     namespaces = {}
-    for index in enumerate(namespacenames):
+    for index in range(len(namespacenames)):
         namespaces[namespacenames[index - 1]] = [namespacecontent[index - 1]]
     return(namespaces)
 
@@ -1788,8 +1788,16 @@ def removeattributes(thisobject,toremovenewlines = False):
                         else:
                             if not((checkforstringat(" " + _isoffsetstring,newlines[len(newlines) - 1],1)) or (checkforstringat(_isoffsetstring,newlines[len(newlines) - 1],1))):
                                 newlines.append(newline)
+                            #else:
+                                #newlines[len(newlines) - 1] = newline
                     else:
-                        newlines.append(newline)
+                        if (len(newlines) == 0):
+                            newlines.append(newline)
+                        else:
+                            if not((checkforstringat(" " + _isoffsetstring,newlines[len(newlines) - 1],1)) or (checkforstringat(_isoffsetstring,newlines[len(newlines) - 1],1))):
+                                newlines.append(newline)
+                            else:
+                                newlines[len(newlines) - 1] = newline
     return(linestostring(newlines))
 
 def getuserdefinedtype(thisobject):
@@ -1805,7 +1813,7 @@ def getuserdefinedtype(thisobject):
         if onword > len(words): #not found - unknown structure, so unknown object. This should not happen!
             userdefinedtypeofobject = "Other"
             break
-        if listcontains(thisword,_userdefinedtypes):
+        if thisword in _userdefinedtypes:
             userdefinedtypeofobject = thisword
             #isshared = (contains(".<",(item(2,lines))) or contains(" :",(item(2,lines))) or contains(">.",(item(2,lines)))) #in dump cs, a shared class has '(nameofclass).,' and ' :'.
             isshared = False
@@ -1830,7 +1838,7 @@ def getisshared(thisobject):
         if onword > len(words): #not found - unknown structure, so unknown object. This should not happen!
             isshared = False
             break
-        if listcontains(thisword,_userdefinedtypes):
+        if thisword in _userdefinedtypes:
             #isshared = (contains(".<",(item(2,lines))) or contains(" :",(item(2,lines))) or contains(">.",(item(2,lines)))) #in dump cs, a shared class has '(nameofclass).,' and ' :'.
             isshared = False
             for i in _sharedobjectstrings:
@@ -1854,7 +1862,7 @@ def getobjecttype(thisobject):
         onword = onword + 1
         if onword > len(words): #not found - unknown structure, so unknown object. This should not happen! We assume type is correct anyway.
             break
-        if listcontains(thisword,_userdefinedtypes): #say we want public from public enum, or internal static from internal static class. we 
+        if thisword in _userdefinedtypes: #say we want public from public enum, or internal static from internal static class. we 
             break
         typeofobject = join(typeofobject,thisword," ")
     if lastletter(typeofobject) == "": #we should have gotten a space at the end, since each time, we add the word and " ". We don't want the last space.
@@ -1994,7 +2002,7 @@ def replacetypenames(thistype):
     #Replace names
     newwords = []
     for thisword in words:
-        if not(listcontains(thisword,_types)):
+        if not(thisword in _types):
             newwords.append(_typenamereplace)
         else:
             newwords.append(thisword)
@@ -2077,19 +2085,17 @@ def getmethods(methodslist):
 
 
 def getfullmethods(thisobject):
+    global fullmethods
     thisobject = removeattributes(thisobject)
     lines = getlines(thisobject,True,True)
-    if listcontains(_methodsstart,lines):
+    if (_methodsstart in lines):
         fullmethods = ""
-        i = indexofitem(_methodsstart,lines) + 1
+        i = lines.index(_methodsstart) + 1
         start = i
         thisitem = removewhitespace(lines[i])
         fullmethods = concat([fullmethods,thisitem],"\n")
         i = i + 1
         thisitem = removewhitespace(lines[i])
-        if not(iswhitespace(thisitem)):
-                fullmethods = concat([fullmethods,thisitem],"\n")
-                thisitem = removewhitespace(lines[i - 1])
         i = i + 1
         while not((listcontains(thisitem,_contentends) or i > (len(lines) - 1))):
             i = i + 1
@@ -2209,19 +2215,20 @@ def getfullfields(thisobject):
     global fullfields
     thisobject = removeattributes(thisobject)
     lines = getlines(thisobject,True,True)
-    if listcontains(_fieldsstart,lines):
+    if (_fieldsstart in lines):
         fullfields = ""
-        i = indexofitem(_fieldsstart,lines) + 1
+        i = lines.index(_fieldsstart) + 1
         start = i
-        thisitem = removewhitespace(lines[i - 1])
+        thisitem = removewhitespace(lines[i])
         fullfields = concat([fullfields,thisitem],"\n")
         i = i + 1
-        thisitem = removewhitespace(lines[i - 1])
+        thisitem = removewhitespace(lines[i])
+        i = i + 1
         while not((listcontains(thisitem,_contentends) or i > (len(lines) - 1))):
+            i = i + 1
             if not(iswhitespace(thisitem)):
                 fullfields = concat([fullfields,thisitem],"\n")
             thisitem = removewhitespace(lines[i - 1])
-            i = i + 1
     else:
         fullfields = ""
     return(fullfields)
@@ -2230,19 +2237,20 @@ def getfullproperties(thisobject):
     global fullproperties
     thisobject = removeattributes(thisobject)
     lines = getlines(thisobject,True,True)
-    if listcontains(_propertiesstart,lines):
+    if (_propertiesstart in lines):
         fullproperties = ""
-        i = indexofitem(_propertiesstart,lines) + 1
+        i = lines.index(_propertiesstart) + 1
         start = i
-        thisitem = removewhitespace(lines[i - 1])
+        thisitem = removewhitespace(lines[i])
         fullproperties = concat([fullproperties,thisitem],"\n")
         i = i + 1
-        thisitem = removewhitespace(lines[i - 1])
+        thisitem = removewhitespace(lines[i])
+        i = i + 1
         while not((listcontains(thisitem,_contentends) or i > (len(lines) - 1))):
-            if not(iswhitespace(thisitem)):
-               fullproperties = concat([fullproperties,thisitem],"\n")
-            thisitem = removewhitespace(lines[i - 1])
             i = i + 1
+            if not(iswhitespace(thisitem)):
+                fullproperties = concat([fullproperties,thisitem],"\n")
+            thisitem = removewhitespace(lines[i - 1])
     else:
         fullproperties = ""
     return(fullproperties)
@@ -2350,7 +2358,7 @@ def getobjects(fullobjects,getshared = True,namespacefilter = None,justnameandty
                 if getisshared(thisfullobject):
                     valid = False
         if (namespacefilter != None) and valid:
-            if not(listcontains(getobjectnamespace(thisfullobject),namespacefilter)):
+            if not(getobjectnamespace(thisfullobject) in namespacefilter):
                 valid = False
         if valid:
             if justnameandtypemodel:
@@ -2421,7 +2429,7 @@ def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodpara
     #should also exist in the obfuscated one (newer)
     templist2 = fields1
     for item in templist2:
-        if listcontains(item,templist):
+        if (item in templist):
             score = score + _fieldweighttrue
             templist = listremoveitem(item,templist)
     #Methods
@@ -2437,7 +2445,7 @@ def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodpara
     #should also exist in the obfuscated one (newer)
     templist2 = methods1
     for item in templist2:
-        if listcontains(item,templist):
+        if (item in templist):
             score = score + _methodweighttrue
             templist = listremoveitem(item,templist)
     #Properties
@@ -2453,7 +2461,7 @@ def typemodelsmatch(model1,model2,usetolerance = None,dosize = True,domethodpara
     #should also exist in the obfuscated one (newer)
     templist2 = properties1
     for item in templist2:
-        if listcontains(item,templist):
+        if (item in templist):
             score = score + _propertyweighttrue
             templist = listremoveitem(item,templist)
     #To do: method params, number of shared classes for class
@@ -2614,25 +2622,25 @@ def comparativedeobfuscationdemo(classestofind):
     print("Class(es) deobfuscated in " + timetaken + " miliseconds.")
     global results
     results = {}
-    for i in enumerate(unobfuscatednames):
+    for i in range(len(unobfuscatednames)):
         results[str(unobfuscatednames[i])] = list(obfuscatednames[i])
     global output
     output = ""
-    for i in enumerate(unobfuscatednames):
+    for i in range(len(unobfuscatednames)):
         output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
     return(output)
 
 
 def deobfuscateallclassesdemo():
    global _tolerance
-   #unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 dump.cs"
-   #obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us 2022.7.12 dump.cs"
+   unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/Pixel Gun 3D/Pixel Gun 3D 16.6.1/Pixel Gun 3D 16.6.1 Dump.txt"
+   obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/Pixel Gun 3D/Pixel Gun 3D 22.5.3/PG3D 22.5.3 dump.cs"
    #unobfuscateddumpcs = prompt("\nEnter the path to your UNOBFUSCATED dump.cs file (without quotes):")
    #obfuscateddumpcs = prompt("Enter the path to your OBFUSCATED dump.cs file (without quotes):")
    dumpcspath = unobfuscateddumpcs
    loaddumpcs(dumpcspath)
    startspeedtest()
-   getfullobjects(dumpcs,False)
+   getfullobjects(dumpcs,True)
    endspeedtest()
    print("All classes/structs/interfaces/enums extracted from dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
@@ -2640,7 +2648,7 @@ def deobfuscateallclassesdemo():
    endspeedtest()
    print("All classes extracted from dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
-   unobfuscated = getobjects(fullclasses,False,_nonamespacename,False)
+   unobfuscated = getobjects(fullclasses,True,_nonamespacename,False)
    endspeedtest()
    print("All type models extracted from dump.cs in " + timetaken + " miliseconds.")
    write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\unobfuscatedobjects.txt",str(unobfuscated))
@@ -2651,7 +2659,7 @@ def deobfuscateallclassesdemo():
    dumpcspath = obfuscateddumpcs
    loaddumpcs(dumpcspath)
    startspeedtest()
-   getfullobjects(dumpcs,False)
+   getfullobjects(dumpcs,True)
    endspeedtest()
    print("All classes/structs/interfaces/enums extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
@@ -2659,7 +2667,7 @@ def deobfuscateallclassesdemo():
    endspeedtest()
    print("All classes extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    startspeedtest()
-   obfuscated = getobjects(fullclasses,False,_nonamespacename,False)
+   obfuscated = getobjects(fullclasses,True,_nonamespacename,False)
    endspeedtest()
    print("All type models extracted from obfuscated dump.cs in " + timetaken + " miliseconds.")
    write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Temp Folders\Python Temps\obfuscatedobjects.txt",str(obfuscated))
@@ -2704,11 +2712,11 @@ def deobfuscateallclassesdemo():
    print("All class names deobfuscated in " + timetaken + " miliseconds.")
    global results
    results = {}
-   for i in enumerate(unobfuscatednames):
+   for i in range(len(unobfuscatednames)):
        results[str(unobfuscatednames[i])] = list(obfuscatednames[i])
    global output
    output = ""
-   for i in enumerate(unobfuscatednames):
+   for i in range(len(unobfuscatednames)):
        output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
    return(output)
 
@@ -2718,10 +2726,10 @@ def builddeobfuscationoutput():
    global unobfuscatednames
    global obfuscatednames
    results = {}
-   for i in enumerate(unobfuscatednames):
+   for i in range(len(unobfuscatednames)):
        results[str(unobfuscatednames[i])] = list(obfuscatednames[i])
    output = ""
-   for i in enumerate(unobfuscatednames):
+   for i in range(len(unobfuscatednames)):
        output = output + str(unobfuscatednames[i]) + " = " + str(obfuscatednames[i]) + "\n"
    return(output)
 
@@ -2758,14 +2766,18 @@ print("Note: The program may have errors, get stuck in infinite loops, or not wo
 depending on your device. Be patient - it is worth the wait!")
 init()
 #a = "// Namespace: \ninternal static class 一丐世丟丒丞丄与世 // TypeDefIndex: 13480\n{\n	// Fields\n	private static float 丘与丆且丁专丅丁丛; // 0x0\n	[CompilerGeneratedAttribute] // RVA: 0x1D85380 Offset: 0x1D85380 VA: 0x1D85380\n	private static Dictionary<string, float> <世丝丒丂丝与一丐不>k__BackingField; // 0x8\n	private static bool 世丝丄丑丁丆丄三业; // 0x10\n\n	// Properties\n	internal static Dictionary<string, float> 丞丂业丅丐三丁七丞 { get; set; }\n	private static bool 业丁丈丑丟丝丘丟世 { get; }\n	internal static string 丝丟三丌丁七三不丈 { get; }\n	internal static string 丗丑丞七万业丏丈丞 { get; }\n	internal static string 丌上丌丆上与丘丘丘 { get; }\n	internal static string 丟丟丛世不万且万丙 { get; }\n	internal static string 丁且丈丌丁丁丙丏与 { get; }\n	internal static bool 七不丝三世丑丂不丐 { get; set; }\n	internal static float 丟上丆丕丛丕专丗与 { get; set; }\n	internal static float 万丌不丈丂丈东丂丄 { get; }\n	internal static bool 丈万七与丙与下丆丁 { get; }\n	internal static bool 一丅丞丘专丌丒业丌 { get; }\n	internal static float 丏丙丝丆丄下丐不丗 { get; }\n	internal static float 丛丌世丆丁业且丈丈 { get; }\n	internal static float 丄丘丂丗丘丈与丘丞 { get; }\n	internal static float 与下万且丑丁东三与 { get; }\n	internal static float 丗丕与丆丘不丂万专 { get; }\n	internal static bool 丄下丛丌不丁业七丟 { get; }\n	internal static float 三且丂丏丄业丐与丏 { get; }\n	internal static float 丈七丟丈一与一一丑 { get; }\n	internal static bool 丅丂下丈一不丌丑丒 { get; }\n	internal static bool 丐丕丑丐专上丂丅丅 { get; }\n	internal static bool 丝万万七七丕不丒东 { get; }\n	internal static bool 一丐丅丈丈丕丆业世 { get; }\n	internal static bool 丑丑丆丂万万丆丕丂 { get; }\n	internal static bool 万丝丈专三丌业丏丞 { get; }\n	internal static bool 不且下丐丈丂七丗业 { get; }\n	internal static bool 世万丗上世丅丁三丕 { get; }\n	internal static bool 丛丞丒一上丂丘丌三 { get; }\n	internal static bool 丗与丂丗丆丈丌万万 { get; }\n	internal static bool 丞东专东一丆丌丁丟 { get; }\n	internal static bool 丙丕一丈一丐丐丏三 { get; }\n	internal static bool 丂丙丅与丑丙且丁丞 { get; }\n	internal static bool 丛丌丄下业丒丂丝丂 { get; }\n	private static bool 与东丒不丅丙万丘丂 { get; }\n\n	// Methods\n\n	// RVA: 0x4095680 Offset: 0x4095680 VA: 0x4095680\n	private static void .cctor() { }\n\n	[CompilerGeneratedAttribute] // RVA: 0x1DF9AC4 Offset: 0x1DF9AC4 VA: 0x1DF9AC4\n	// RVA: 0x4095A90 Offset: 0x4095A90 VA: 0x4095A90\n	internal static Dictionary<string, float> 业世丞丙丆万丙东丛() { }\n\n	[CompilerGeneratedAttribute] // RVA: 0x1DF9AD4 Offset: 0x1DF9AD4 VA: 0x1DF9AD4\n	// RVA: 0x4095A24 Offset: 0x4095A24 VA: 0x4095A24\n	private static void 丟下业三下万万下下(Dictionary<string, float> 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x4095AF8 Offset: 0x4095AF8 VA: 0x4095AF8\n	private static bool 丁丂丞丁丗业丐一丄() { }\n\n	// RVA: 0x4095C54 Offset: 0x4095C54 VA: 0x4095C54\n	internal static string 上与丏丁世丈丝丐丟() { }\n\n	// RVA: 0x4095D48 Offset: 0x4095D48 VA: 0x4095D48\n	internal static string 丌万丕世丒丑丛东世() { }\n\n	// RVA: 0x4095E3C Offset: 0x4095E3C VA: 0x4095E3C\n	internal static string 上丏下丄世上专丙丆() { }\n\n	// RVA: 0x4095F30 Offset: 0x4095F30 VA: 0x4095F30\n	internal static string 丝七上丅且丅三一丏() { }\n\n	// RVA: 0x4096024 Offset: 0x4096024 VA: 0x4096024\n	internal static string 东且丑专丁且丈丈丝() { }\n\n	// RVA: 0x40960C4 Offset: 0x40960C4 VA: 0x40960C4\n	internal static bool 上丗丗与丗丝丑丏丆() { }\n\n	// RVA: 0x409612C Offset: 0x409612C VA: 0x409612C\n	internal static void 不丕三丅丈丅丛七丝(bool 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x409619C Offset: 0x409619C VA: 0x409619C\n	internal static float 丞一上丕丕丅丞丙丅() { }\n\n	// RVA: 0x4096204 Offset: 0x4096204 VA: 0x4096204\n	internal static void 且丁下丙丝七丂世丗(float 丗专丆丑丑丛七万不) { }\n\n	// RVA: 0x4096324 Offset: 0x4096324 VA: 0x4096324\n	internal static float 丆丞丘丟丞丛专三丈() { }\n\n	// RVA: 0x4096EF4 Offset: 0x4096EF4 VA: 0x4096EF4\n	internal static bool 专丝不丝丗世丞丕丂() { }\n\n	// RVA: 0x4096F74 Offset: 0x4096F74 VA: 0x4096F74\n	internal static bool 世丟且万丐丆与丏丘() { }\n\n	// RVA: 0x409775C Offset: 0x409775C VA: 0x409775C\n	internal static float 丄丂丄丙丑丈丞丌一() { }\n\n	// RVA: 0x4097B10 Offset: 0x4097B10 VA: 0x4097B10\n	internal static float 丅丝丄丏丕丝与丐下() { }\n\n	// RVA: 0x4097D04 Offset: 0x4097D04 VA: 0x4097D04\n	internal static float 丏丝丛丏万丙业丌丈() { }\n\n	// RVA: 0x4097D8C Offset: 0x4097D8C VA: 0x4097D8C\n	internal static float 万丛丐东丂丅丑业三() { }\n\n	// RVA: 0x4097F8C Offset: 0x4097F8C VA: 0x4097F8C\n	internal static float 上丐丆业丆丐与丝丗() { }\n\n	// RVA: 0x40984B8 Offset: 0x40984B8 VA: 0x40984B8\n	internal static bool 世丕丘丄世丆世丏世() { }\n\n	// RVA: 0x409875C Offset: 0x409875C VA: 0x409875C\n	internal static float 丌丛丙不丟丅一丆丛() { }\n\n	// RVA: 0x4098E64 Offset: 0x4098E64 VA: 0x4098E64\n	internal static float 丒丆专丑丗丆与丗丞() { }\n\n	// RVA: 0x40998D4 Offset: 0x40998D4 VA: 0x40998D4\n	internal static bool 丕业丄丞丆丛专且丑() { }\n\n	// RVA: 0x409993C Offset: 0x409993C VA: 0x409993C\n	internal static bool 丌丌且丙丗丈丄业丒() { }\n\n	// RVA: 0x40999A4 Offset: 0x40999A4 VA: 0x40999A4\n	internal static float 丟丄丙丒丗丂丗与七(int 丌丂丅丑丗且丌丞丑) { }\n\n	// RVA: 0x4099E48 Offset: 0x4099E48 VA: 0x4099E48\n	internal static float 业丕丟丑丏上丌一万(int 丞丕不不丘丗丟丄丈) { }\n\n	// RVA: 0x409A67C Offset: 0x409A67C VA: 0x409A67C\n	internal static float 丈专丙丅丕丌丄专下(int 丌丂丅丑丗且丌丞丑) { }\n\n	// RVA: 0x409A760 Offset: 0x409A760 VA: 0x409A760\n	internal static float 丙丐丅上七丒与丑业() { }\n\n	// RVA: 0x409A7F4 Offset: 0x409A7F4 VA: 0x409A7F4\n	internal static float 丝东下下丂丞上丕丟() { }\n\n	// RVA: 0x409A888 Offset: 0x409A888 VA: 0x409A888\n	internal static float 下丕丅下世且一东七() { }\n\n	// RVA: 0x409A91C Offset: 0x409A91C VA: 0x409A91C\n	internal static float 丁一不一万下丗丗世(int 丂丏丄且丂专业万丟) { }\n\n	// RVA: 0x409C4A4 Offset: 0x409C4A4 VA: 0x409C4A4\n	internal static float 丌丐专下丘一丑不丞(int 丂丏丄且丂专业万丟) { }\n\n	// RVA: 0x409C53C Offset: 0x409C53C VA: 0x409C53C\n	internal static float 一丆丘与业东丅与丟(string 丗下丏三东七丞专东) { }\n\n	// RVA: 0x409C9B0 Offset: 0x409C9B0 VA: 0x409C9B0\n	internal static float 与万丌专一一不丌丘(WeaponSounds 丅丏丆丆且丒世上丁, string 丗丑丞七万业丏丈丞, string 丌上丌丆上与丘丘丘, string 丟丟丛世不万且万丙) { }\n\n	// RVA: 0x409CF00 Offset: 0x409CF00 VA: 0x409CF00\n	internal static float 丐丘丗丞专丒一丟丝(int 丞下丛丆万与且丘丒) { }\n\n	// RVA: 0x409D6EC Offset: 0x409D6EC VA: 0x409D6EC\n	internal static float 丙东丟丁东丘丆七丞(int 不丏丞丗丞三丅丄丝, string 丗丑丞七万业丏丈丞, string 丌上丌丆上与丘丘丘, string 丟丟丛世不万且万丙) { }\n\n	// RVA: 0x409DBBC Offset: 0x409DBBC VA: 0x409DBBC\n	internal static float 丙业下丄丕且丝丙三() { }\n\n	// RVA: 0x409DC2C Offset: 0x409DC2C VA: 0x409DC2C\n	internal static float 世丈丂丑丝丘丂丛专() { }\n\n	// RVA: 0x409DC9C Offset: 0x409DC9C VA: 0x409DC9C\n	internal static float 下丙万丆丗丝专丙丝() { }\n\n	// RVA: 0x409DD0C Offset: 0x409DD0C VA: 0x409DD0C\n	internal static float 丈上丁丏丂丁东专丄() { }\n\n	// RVA: 0x409E074 Offset: 0x409E074 VA: 0x409E074\n	internal static float 丙丄专七丌丛丙丏三() { }\n\n	// RVA: 0x409E168 Offset: 0x409E168 VA: 0x409E168\n	internal static bool 专一丄丛丏丗下丄三() { }\n\n	// RVA: 0x409E250 Offset: 0x409E250 VA: 0x409E250\n	internal static bool 丑上丒且一丕三业一() { }\n\n	// RVA: 0x409E338 Offset: 0x409E338 VA: 0x409E338\n	internal static bool 丘丗丆丗不丘丐上且() { }\n\n	// RVA: 0x409E420 Offset: 0x409E420 VA: 0x409E420\n	internal static bool 丆丐世丕万专丑丌丑() { }\n\n	// RVA: 0x409E508 Offset: 0x409E508 VA: 0x409E508\n	internal static bool 丞丞丒东东万丞丞丙() { }\n\n	// RVA: 0x409E5F0 Offset: 0x409E5F0 VA: 0x409E5F0\n	internal static bool 丁世丝丝一一世丘丐() { }\n\n	// RVA: 0x409E698 Offset: 0x409E698 VA: 0x409E698\n	internal static bool 丏丙东不七丑丒且丄() { }\n\n	// RVA: 0x409E740 Offset: 0x409E740 VA: 0x409E740\n	internal static bool 丈丙丅丄三丘且丈丆() { }\n\n	// RVA: 0x409E7E8 Offset: 0x409E7E8 VA: 0x409E7E8\n	internal static bool 且丄东专业与万丈万() { }\n\n	// RVA: 0x409E890 Offset: 0x409E890 VA: 0x409E890\n	internal static bool 丒丟一一丄丈丁与丑() { }\n\n	// RVA: 0x409E938 Offset: 0x409E938 VA: 0x409E938\n	internal static bool 丝丆万丝丂丌丛下丞() { }\n\n	// RVA: 0x409E9E0 Offset: 0x409E9E0 VA: 0x409E9E0\n	internal static bool 丆丙丄不业丝七万七() { }\n\n	// RVA: 0x4096E2C Offset: 0x4096E2C VA: 0x4096E2C\n	private static bool 一丟丞丆丗专专且丄() { }\n}"#deobfuscateallclassesdemo()
-unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 dump.cs"
+#print(getfullmethods(a))
+#print(getfullfields(a))
+#print(getfullproperties(a))
+#sys.exit()
+#unobfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us  2020.9.9 dump.cs"
 #obfuscateddumpcs = r"C:/Users/zachy/OneDrive/Documents/Work/Projects/AMOGUS/Among Us 2022.7.12 dump.cs"
 #unobfuscateddumpcs = prompt("\nEnter the path to your UNOBFUSCATED dump.cs file (without quotes):")
 #obfuscateddumpcs = prompt("Enter the path to your OBFUSCATED dump.cs file (without quotes):")
-dumpcspath = unobfuscateddumpcs
-loaddumpcs(dumpcspath)
-timetest(1)
-sys.exit()
+#dumpcspath = unobfuscateddumpcs
+#loaddumpcs(dumpcspath)
+#timetest(1)
+#sys.exit()
 deobfuscateallclassesdemo()
 #comparativedeobfuscationdemo(["Rocket"])
 #write_file(r"C:\Users\zachy\OneDrive\Documents\Work\Outputs\output.txt",output)

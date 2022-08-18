@@ -1400,8 +1400,14 @@ def read_file(path,readtype = "r"):
     
 def write_file(path,new):
     file = openfile(path, "w")
-    file.write(str(new))
-    file.close()
+    try:
+        file.write(str(new))
+        return(path)
+    except OSError:
+        outofdiskspaceerror()
+        return(None)
+    finally:
+        file.close()
 
 def fileexists(path,giveerror = False):
     if (giveerror and not(exists(path))):
@@ -1563,6 +1569,30 @@ def getsubfolder(root,subpath,returntype = "path"):
         else:
             foldernotfounderror(newpath)
             return None
+
+def copyfolder(olddir,newdir,cancelifoverwrite = "Warn"):
+    try:
+        if cancelifoverwrite = "Warn" or cancelifoverwrite = "True" or cancelifoverwrite = "warn" or cancelifoverwrite = "true" or cancelifoverwrite = True:
+            shutil.copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2, ignore_dangling_symlinks=False, dirs_exist_ok=True)
+        else:
+            shutil.copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2, ignore_dangling_symlinks=False, dirs_exist_ok=False)
+        return(newdir)
+    except FileExistsError:
+        if cancelifoverwrite = "Warn" or cancelifoverwrite = "warn":
+            if confirmfileoverwrite(newdir):
+                copyfolder(olddir,newdir,False)
+            else:
+                filealreadyexistserror(newdir)
+                return(None)
+        else:
+            filealreadyexistserror(newdir)
+            return(None)
+    except OSError:
+        outofdiskspaceerror()
+        return(None)
+    else:
+        unknownfilecopyerror()
+        return(None)
 
 def parsexmlfile(path):
     log("Parsing xml file: " + path)
@@ -3155,14 +3185,34 @@ def bruteforcedeobfuscateobject(thisunobfuscated):
 #       Mod Menu Installation
 
 class ModMenuInstall():
-    def androidmanifest(apk):
+    def __init__(self,apkpath,modmenuapkpath,newapkpath,menutype = "LGL"):
+    self.apkpath = apkpath
+    self.modmenuapkpath = modmenuapkpath
+    self.newapkpath = modmenuapkpath
+    self.menutype = menutype
+    copyfolder(apkpath,newapkpath,menutype,cancelifoverwrite = "Warn")
+    def androidmanifest(self):
+        #Add required permissions to AndroidManifest.xml
+        permissionsstring = ""
+        if self.menutype = "LGL":
+            requiredpermissions = ["<uses-permission android:name=\"android.permission.SYSTEM_ALERT_WINDOW\"/>"]
+        for thispermission in requiredpermissions:
+            permissionsstring = permissionsstring + thispermission + "\n"
         if getfileextension(apk) == "apk":
             apknotdecompilederror(apk)
             return None
-        content = getandroidmanifestfromapk(apk,"read")
+        content = getandroidmanifestfromapk(apk,"content")
         if content is None:
             return None
         else:
+            #Add required permissions string to AndroidManifest.xml via text search and replace
+            trypermissions = ["<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"]
+            found = 0
+            for thispermission in trypermissions:
+                if (thispermission in content):
+                    found = 1
+                    content = content.replace(thispermission,permissionsstring + thispermissions)
+                    break
             return(content)
         
 

@@ -3187,33 +3187,67 @@ def bruteforcedeobfuscateobject(thisunobfuscated):
 class ModMenuInstall():
     def __init__(self,apkpath,modmenuapkpath,newapkpath,menutype = "LGL"):
     self.apkpath = apkpath
+    if getfileextension(self.apkpath) == "apk":
+            apknotdecompilederror(apkpath)
+            return None
+        if not(folderexists(self.apkpath)):
+            foldernotfounderror(self.apkpath)
+            return None
     self.modmenuapkpath = modmenuapkpath
     self.newapkpath = modmenuapkpath
     self.menutype = menutype
     copyfolder(apkpath,newapkpath,menutype,cancelifoverwrite = "Warn")
     def androidmanifest(self):
+        if getfileextension(apk) == "apk":
+            apknotdecompilederror(apk)
+            return None
+        if not(folderexists(apkpath)):
+            foldernotfounderror(apkpath)
+            return None
+        content = getandroidmanifestfromapk(self.apk,"content")
         #Add required permissions to AndroidManifest.xml
         permissionsstring = ""
         if self.menutype = "LGL":
             requiredpermissions = ["<uses-permission android:name=\"android.permission.SYSTEM_ALERT_WINDOW\"/>"]
         for thispermission in requiredpermissions:
             permissionsstring = permissionsstring + thispermission + "\n"
-        if getfileextension(apk) == "apk":
-            apknotdecompilederror(apk)
-            return None
-        content = getandroidmanifestfromapk(apk,"content")
         if content is None:
-            return None
+            permissionssuccess = False
         else:
-            #Add required permissions string to AndroidManifest.xml via text search and replace
-            trypermissions = ["<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"]
-            found = 0
-            for thispermission in trypermissions:
-                if (thispermission in content):
-                    found = 1
-                    content = content.replace(thispermission,permissionsstring + thispermissions)
-                    break
-            return(content)
+            if permissionsstring != ""
+                #Add required permissions string to AndroidManifest.xml via text search and replace
+                trypermissions = ["<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>"]
+                found = False
+                for thispermission in trypermissions:
+                    if (thispermission in content):
+                        found = True
+                        content = content.replace(thispermission,permissionsstring + thispermissions)
+                        break
+            if found:
+                permissionssuccess = True
+            else:
+                permissionssuccess = False
+        #Add launcher service to AndroidManifest.xml
+        #Place it above the end tag of the application
+        if self.menutype == "LGL":
+            launcherservice = "<service android:name=\"com.android.support.Launcher\" android:enabled=\"true\"\n\tandroid:exported=\"false\" android:stopWithTask=\"true\" />"
+        #lastapplicationtag = findstr("</application>",content,index = 0,casesensitive = True,backward = True)
+        found = ("</application>\n</manifest>" in content)
+        if found:
+            content = content.replace("</application>\n</manifest>",launcherservice)
+            launcherservicesuccess = True
+        else:
+            launcherservicesuccess = False
+        if (launcherservicesuccess and permissionssuccess):
+            return(write_file(buildpath(self.newapkpath,"AndroidManifest.xml"),content))
+        else:
+            if not(launcherservicesuccess):
+                pass
+            if not(permissionssuccess):
+                pass
+            return(None)
+        
+            #"<service android:name=\"com.android.support.Launcher\" android:enabled=\"true\"\n\tandroid:exported=\"false\" android:stopWithTask=\"true\" />"
         
 
 #       Demos / Tests

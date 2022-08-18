@@ -339,7 +339,7 @@ importmodule("os")
 importmodule("time")
 importmodule("datetime")
 importmodule("timeit")
-importmodule("xml")
+importmodule("xml",False)
 if osimported:
     from os.path import exists
     from os import listdir
@@ -347,7 +347,6 @@ if osimported:
 importmodule("html",False)
 if htmlimported:
     from html.parser import HTMLParser
-timeimported = True
 if xmlimported:
     from xml.etree import ElementTree
 
@@ -1572,36 +1571,42 @@ def parsexmlfile(path):
         if extension != "xml":
             warning("Attempting to parse '" + path + "' as an xml file, even though it's file extension is '" +  extension + "'.")
         success = 1
+        if not(xmlimported):
+            error("Failed to parse xml file '" + path + "': xmll module not imported.")
+            return(None)
         try:
             return(ElementTree.parse(path))
         except:
             success = 0
         finally:
             if success:
-                log("Successfully parsed xml file: " + path)
+                log("Successfully parsed xml file " + path)
             else:
-                error("Failed to parse xml file: '" + path + "': Invalid Format. This file may be corrupted.")
+                error("Failed to parse xml file '" + path + "': Invalid Format. This file may be corrupted.")
                 return(None)
     else:
-        error("Failed to parse xml file: '" + path + "': File not found at this file path.")
+        error("Failed to parse xml file '" + path + "': File not found at this file path.")
         return(None)
 
 def parsexmlstring(xmlstring):
-        log("Parsing xml string: " + xmlstring)
+        log("Parsing xml string " + xmlstring)
         success = 1
+        if not(xmlimported):
+            error("Failed to parse xml file '" + path + "': xmll module not imported.")
+            return(None)
         try:
             return(ElementTree.fromstring(xmlstring))
         except:
             success = 0
         finally:
             if success:
-                log("Successfully parsed xml strin: " + xmlstring)
+                log("Successfully parsed xml string " + xmlstring)
             else:
-                error("Failed to parse xml string: '" + xmlstring + "': Invalid Format. This data may be corrupted.")
+                error("Failed to parse xml string '" + xmlstring + "': Invalid Format. This data may be corrupted.")
                 return(None)
 
 def getxmlroot(parsedxml):
-    log("Getting root of xml data: " + str(parsedxml))
+    log("Getting root of xml data " + str(parsedxml))
     success = 1
     try:
         root = parsedxml.getroot()
@@ -1612,7 +1617,7 @@ def getxmlroot(parsedxml):
         if success:
             log("Got root of xml data '" + str(parsedxml) + "': " + str(root))
         else:
-            error("Failed to get root of xml data: '" + str(parsedxml) + "'")
+            error("Failed to get root of xml data '" + str(parsedxml) + "'")
             
 def getxmlroottag(parsedxml):
     log("Getting root tag of xml data: " + str(parsedxml))

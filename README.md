@@ -1,8 +1,8 @@
 # Il2cppWorkshop
 Contact me on discord: User123456789#6424 or User123456789#8073.
-A WIP opensource mega-tool for modding il2cpp games including deobfuscation, script generation, cloud file sharing, arm hex conversion, and more!
+A WIP opensource mega-tool for modding il2cpp games including deobfuscation, gameguardian script generation, arm hex conversion, cloud file sharing, dumping, signature killing, automatic internal mod menu installion, and more!
 Inspired by [Il2cppInspector](https://github.com/djkaty/Il2CppInspector)
-Made in python, will maybe be ported to c++ or other languages eventually
+Made in python, will maybe be ported to C++, C#, Rust, or other languages eventually
 I am aware that the code is very messy and inefficient. This is only a WIP and nothing is final. I am trying to make functionality and maintain motivation.
 
 # Goals:
